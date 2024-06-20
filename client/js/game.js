@@ -115,6 +115,7 @@ export function onKeyDown(event) {
         case 'ShiftLeft':
             if (!isJumping) {
                 isCrouching = true; // しゃがみ状態を有効化
+                yawObject.position.y = crouchHeight; // 直接高さを変更
             }
             break;
     }
@@ -137,6 +138,9 @@ export function onKeyUp(event) {
             break;
         case 'ShiftLeft':
             isCrouching = false; // しゃがみ状態を解除
+            if (!isJumping) {
+                yawObject.position.y = normalHeight; // 直接高さを変更
+            }
             break;
     }
 }
@@ -162,13 +166,6 @@ export function animate() {
     velocity.y -= gravity * delta;
     yawObject.position.y += velocity.y * delta;
 
-    // しゃがみとジャンプの管理
-    if (!isJumping && isCrouching) {
-        yawObject.position.y = Math.max(crouchHeight, yawObject.position.y - delta * 2); // しゃがみ時の高さを調整
-    } else if (!isJumping && !isCrouching) {
-        yawObject.position.y = Math.min(normalHeight, yawObject.position.y + delta * 2); // 通常時の高さを調整
-    }
-
     // 床に着地した場合
     if (yawObject.position.y < normalHeight && velocity.y < 0) {
         if (yawObject.position.y < crouchHeight) {
@@ -185,4 +182,6 @@ export function animate() {
     yawObject.translateZ(velocity.z * delta);
 
     renderer.render(scene, camera);
+
+    console.log(`Y Position: ${yawObject.position.y}, isCrouching: ${isCrouching}`);
 }
