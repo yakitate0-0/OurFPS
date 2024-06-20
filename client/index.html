@@ -1,5 +1,6 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
@@ -8,7 +9,8 @@
         body {
             margin: 0;
             overflow: hidden;
-            cursor: none; /* カーソルを隠す */
+            cursor: none;
+            /* カーソルを隠す */
         }
     </style>
     <script type="importmap">
@@ -20,184 +22,9 @@
         }
     </script>
 </head>
+
 <body>
-    <script type="module">
-        import * as THREE from 'three';
-        import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
-        import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
-
-        let camera, scene, renderer;
-        let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
-        let canJump = true;  // ジャンプできるかどうか
-        let velocity = new THREE.Vector3();
-        let direction = new THREE.Vector3();
-        const jumpSpeed = 9.0; // ジャンプの初速度
-        const gravity = 30.0; // 重力
-        const clock = new THREE.Clock();
-        const pitchObject = new THREE.Object3D();
-        const yawObject = new THREE.Object3D();
-        const speed = 50.0; // 移動速度
-
-        // 初期化
-        function init() {
-            scene = new THREE.Scene();
-
-            camera = new THREE.PerspectiveCamera(
-                75,
-                window.innerWidth / window.innerHeight,
-                0.1,
-                1000
-            );
-            pitchObject.add(camera);
-            yawObject.add(pitchObject);
-            scene.add(yawObject);
-
-            // 初期カメラ位置設定
-            yawObject.position.y = 1.5;
-
-            renderer = new THREE.WebGLRenderer();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-            document.body.appendChild(renderer.domElement);
-
-            // ライト
-            const ambientLight = new THREE.AmbientLight(0xffffff, 2);
-            scene.add(ambientLight);
-
-            const directionalLight = new THREE.DirectionalLight(0xffffff, 1);
-            directionalLight.position.set(1, 1, 1).normalize();
-            scene.add(directionalLight);
-
-            // GLTFLoader
-            const loader = new GLTFLoader();
-            const dracoLoader = new DRACOLoader();
-            dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
-            loader.setDRACOLoader(dracoLoader);
-
-            loader.load(
-                "assets/models/stage.glb",
-                function (gltf) {
-                    scene.add(gltf.scene);
-                },
-                undefined,
-                function (error) {
-                    console.error(error);
-                }
-            );
-
-            // イベントリスナー
-            document.addEventListener('mousemove', onMouseMove, false);
-            document.addEventListener('keydown', onKeyDown, false);
-            document.addEventListener('keyup', onKeyUp, false);
-
-            window.addEventListener('resize', onWindowResize, false);
-
-            // カーソルロックを要求する
-            document.body.requestPointerLock = document.body.requestPointerLock || document.body.mozRequestPointerLock;
-            document.body.addEventListener('click', () => {
-                document.body.requestPointerLock();
-            });
-        }
-
-        // ウィンドウサイズ変更時の処理
-        function onWindowResize() {
-            camera.aspect = window.innerWidth / window.innerHeight;
-            camera.updateProjectionMatrix();
-            renderer.setSize(window.innerWidth, window.innerHeight);
-        }
-
-        // マウス移動の処理
-        function onMouseMove(event) {
-            // カーソルがロックされている場合のみカメラの向きを変える
-            if (document.pointerLockElement === document.body) {
-                const movementX = event.movementX || event.mozMovementX || event.webkitMovementX || 0;
-                const movementY = event.movementY || event.mozMovementY || event.webkitMovementY || 0;
-
-                yawObject.rotation.y -= movementX * 0.002;
-                pitchObject.rotation.x -= movementY * 0.002;
-
-                // ピッチオブジェクトのx軸回転を制限して、完全に回転しないようにする
-                pitchObject.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitchObject.rotation.x));
-            }
-        }
-
-        // キーボードの押下処理
-        function onKeyDown(event) {
-            switch (event.code) {
-                case 'KeyW':
-                    moveForward = true;
-                    break;
-                case 'KeyA':
-                    moveRight = true;
-                    break;
-                case 'KeyS':
-                    moveBackward = true;
-                    break;
-                case 'KeyD':
-                    moveLeft = true;
-                    break;
-                case 'Space':
-                    if (canJump) {
-                        velocity.y = jumpSpeed;
-                        canJump = false;
-                    }
-                    break;
-            }
-        }
-
-        // キーボードの解放処理
-        function onKeyUp(event) {
-            switch (event.code) {
-                case 'KeyW':
-                    moveForward = false;
-                    break;
-                case 'KeyA':
-                    moveRight = false;
-                    break;
-                case 'KeyS':
-                    moveBackward = false;
-                    break;
-                case 'KeyD':
-                    moveLeft = false;
-                    break;
-            }
-        }
-
-        // アニメーションループ
-        function animate() {
-            requestAnimationFrame(animate);
-
-            const delta = clock.getDelta();
-
-            velocity.x -= velocity.x * 10.0 * delta;
-            velocity.z -= velocity.z * 10.0 * delta;
-
-            direction.z = Number(moveForward) - Number(moveBackward);
-            direction.x = Number(moveRight) - Number(moveLeft);
-            direction.normalize(); // この命令により、対角方向の移動が遅くならない
-
-            if (moveForward || moveBackward) velocity.z -= direction.z * speed * delta;
-            if (moveLeft || moveRight) velocity.x -= direction.x * speed * delta;
-
-            // ジャンプと重力の処理
-            velocity.y -= gravity * delta; // 重力を適用
-            yawObject.position.y += velocity.y * delta; // カメラのY軸位置を更新
-
-            // 床に着地した場合
-            if (yawObject.position.y < 1.5) {
-                velocity.y = 0;
-                yawObject.position.y = 1.5;
-                canJump = true; // 着地したら再びジャンプ可能にする
-            }
-
-            // カメラの前方方向に速度を適用
-            yawObject.translateX(velocity.x * delta);
-            yawObject.translateZ(velocity.z * delta);
-
-            renderer.render(scene, camera);
-        }
-
-        init();
-        animate();
-    </script>
+    <script type="module" src="./js/main.js"></script>
 </body>
+
 </html>
