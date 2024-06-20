@@ -6,7 +6,8 @@ import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 let camera, scene, renderer;
 let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
 let canJump = true;
-let canShipt = false;
+let isJumping = false;
+let isCrouching = false; // しゃがみ状態のフラグ
 let velocity = new THREE.Vector3();
 let direction = new THREE.Vector3();
 const jumpSpeed = 9.0;
@@ -14,7 +15,10 @@ const gravity = 30.0;
 const clock = new THREE.Clock();
 const pitchObject = new THREE.Object3D();
 const yawObject = new THREE.Object3D();
-const speed = 50.0;
+const normalSpeed = 50.0;
+const crouchSpeed = 25.0; // しゃがみ時の速度
+const normalHeight = 1.5; // 通常時の高さ
+const crouchHeight = 1.0; // しゃがみ時の高さ
 
 // 初期化関数
 export function init() {
@@ -25,7 +29,7 @@ export function init() {
     yawObject.add(pitchObject);
     scene.add(yawObject);
 
-    yawObject.position.y = 1.5;
+    yawObject.position.y = normalHeight;
 
     renderer = new THREE.WebGLRenderer();
     renderer.setSize(window.innerWidth, window.innerHeight);
@@ -105,10 +109,13 @@ export function onKeyDown(event) {
             if (canJump) {
                 velocity.y = jumpSpeed;
                 canJump = false;
+                isJumping = true;
             }
             break;
-        case 'Shift':
-            canShipt = true;
+        case 'ShiftLeft':
+            if (!isJumping) {
+                isCrouching = true; // しゃがみ状態を有効化
+            }
             break;
     }
 }
@@ -128,8 +135,8 @@ export function onKeyUp(event) {
         case 'KeyD':
             moveRight = false;
             break;
-        case 'Shift':
-            canShipt = false;
+        case 'ShiftLeft':
+            isCrouching = false; // しゃがみ状態を解除
             break;
     }
 }
@@ -144,24 +151,36 @@ export function animate() {
     velocity.z -= velocity.z * 10.0 * delta;
 
     direction.z = Number(moveForward) - Number(moveBackward);
-    direction.x = Number(moveLeft) - Number(moveRight); // ここを修正
-    direction.normalize(); // 対角方向の移動が遅くならないようにする
+    direction.x = Number(moveLeft) - Number(moveRight);
+    direction.normalize();
 
-    // カメラの向きに基づいて移動方向を計算
-    if (moveForward || moveBackward) velocity.z -= direction.z * speed * delta;
-    if (moveLeft || moveRight) velocity.x -= direction.x * speed * delta;
+    const currentSpeed = isCrouching ? crouchSpeed : normalSpeed; // しゃがみ時の速度を適用
 
-    velocity.y -= gravity * delta; // 重力を適用
-    yawObject.position.y += velocity.y * delta; // カメラのY軸位置を更新
+    if (moveForward || moveBackward) velocity.z -= direction.z * currentSpeed * delta;
+    if (moveLeft || moveRight) velocity.x -= direction.x * currentSpeed * delta;
 
-    // 床に着地した場合
-    if (yawObject.position.y < 1.5) {
-        velocity.y = 0;
-        yawObject.position.y = 1.5;
-        canJump = true; // 着地したら再びジャンプ可能にする
+    velocity.y -= gravity * delta;
+    yawObject.position.y += velocity.y * delta;
+
+    // しゃがみとジャンプの管理
+    if (!isJumping && isCrouching) {
+        yawObject.position.y = Math.max(crouchHeight, yawObject.position.y - delta * 2); // しゃがみ時の高さを調整
+    } else if (!isJumping && !isCrouching) {
+        yawObject.position.y = Math.min(normalHeight, yawObject.position.y + delta * 2); // 通常時の高さを調整
     }
 
-    // カメラの前方方向に速度を適用
+    // 床に着地した場合
+    if (yawObject.position.y < normalHeight && velocity.y < 0) {
+        if (yawObject.position.y < crouchHeight) {
+            yawObject.position.y = crouchHeight;
+        } else {
+            yawObject.position.y = normalHeight;
+        }
+        velocity.y = 0;
+        canJump = true;
+        isJumping = false;
+    }
+
     yawObject.translateX(velocity.x * delta);
     yawObject.translateZ(velocity.z * delta);
 
