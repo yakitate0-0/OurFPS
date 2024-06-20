@@ -1,11 +1,12 @@
 // game.js
 import * as THREE from 'three';
-import { GLTFLoader } from "three/addons/loaders/GLTFLoader.js";
-import { DRACOLoader } from "three/addons/loaders/DRACOLoader.js";
+import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
 
 let camera, scene, renderer;
 let moveForward = false, moveBackward = false, moveLeft = false, moveRight = false;
 let canJump = true;
+let canShipt = false;
 let velocity = new THREE.Vector3();
 let direction = new THREE.Vector3();
 const jumpSpeed = 9.0;
@@ -43,7 +44,7 @@ export function init() {
     loader.setDRACOLoader(dracoLoader);
 
     loader.load(
-        "assets/models/stage.glb",
+        'assets/models/stage.glb',
         function (gltf) {
             scene.add(gltf.scene);
         },
@@ -106,6 +107,9 @@ export function onKeyDown(event) {
                 canJump = false;
             }
             break;
+        case 'Shift':
+            canShipt = true;
+            break;
     }
 }
 
@@ -124,6 +128,9 @@ export function onKeyUp(event) {
         case 'KeyD':
             moveRight = false;
             break;
+        case 'Shift':
+            canShipt = false;
+            break;
     }
 }
 
@@ -137,21 +144,24 @@ export function animate() {
     velocity.z -= velocity.z * 10.0 * delta;
 
     direction.z = Number(moveForward) - Number(moveBackward);
-    direction.x = Number(moveRight) - Number(moveLeft);
-    direction.normalize();
+    direction.x = Number(moveLeft) - Number(moveRight); // ここを修正
+    direction.normalize(); // 対角方向の移動が遅くならないようにする
 
+    // カメラの向きに基づいて移動方向を計算
     if (moveForward || moveBackward) velocity.z -= direction.z * speed * delta;
     if (moveLeft || moveRight) velocity.x -= direction.x * speed * delta;
 
-    velocity.y -= gravity * delta;
-    yawObject.position.y += velocity.y * delta;
+    velocity.y -= gravity * delta; // 重力を適用
+    yawObject.position.y += velocity.y * delta; // カメラのY軸位置を更新
 
+    // 床に着地した場合
     if (yawObject.position.y < 1.5) {
         velocity.y = 0;
         yawObject.position.y = 1.5;
-        canJump = true;
+        canJump = true; // 着地したら再びジャンプ可能にする
     }
 
+    // カメラの前方方向に速度を適用
     yawObject.translateX(velocity.x * delta);
     yawObject.translateZ(velocity.z * delta);
 
