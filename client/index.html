@@ -4,23 +4,21 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>FPS Game</title>
-    <style>
-        body {
-            margin: 0;
-            overflow: hidden;
-            cursor: none; /* カーソルを隠す */
-        }
-    </style>
+    <link rel="stylesheet" href="./css/styles.css">
     <script type="importmap">
         {
           "imports": {
             "three": "https://unpkg.com/three@v0.151.3/build/three.module.js",
-            "three/addons/": "https://unpkg.com/three@v0.151.3/examples/jsm/"
+            "three/addons/": "https://unpkg.com/three@v0.151.3/examples/jsm/",
+            "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.18.0/dist/cannon-es.js"
           }
         }
     </script>
 </head>
 <body>
+    <div id="loading-screen">
+        <div id="loading-text">Loading...</div>
+    </div>
     <script type="module" src="./js/main.js"></script>
 </body>
 </html>

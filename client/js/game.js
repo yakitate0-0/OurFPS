@@ -1,4 +1,3 @@
-// game.js
 import * as THREE from 'three';
 import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 import { DRACOLoader } from 'three/addons/loaders/DRACOLoader.js';
@@ -22,6 +21,9 @@ const crouchHeight = 1.0; // しゃがみ時の高さ
 
 // 初期化関数
 export function init() {
+    // ロード画面の表示
+    showLoadingScreen();
+
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -51,10 +53,14 @@ export function init() {
         'assets/models/stage.glb',
         function (gltf) {
             scene.add(gltf.scene);
+            // ロード完了後にロード画面を非表示にする
+            hideLoadingScreen();
         },
         undefined,
         function (error) {
             console.error(error);
+            // エラーが発生してもロード画面を非表示にする
+            hideLoadingScreen();
         }
     );
 
@@ -68,6 +74,22 @@ export function init() {
     document.body.addEventListener('click', () => {
         document.body.requestPointerLock();
     });
+}
+
+// ロード画面を表示する関数
+function showLoadingScreen() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        loadingScreen.style.display = 'flex'; // 表示
+    }
+}
+
+// ロード画面を非表示にする関数
+function hideLoadingScreen() {
+    const loadingScreen = document.getElementById('loading-screen');
+    if (loadingScreen) {
+        loadingScreen.style.display = 'none'; // 非表示
+    }
 }
 
 // ウィンドウサイズ変更の処理
