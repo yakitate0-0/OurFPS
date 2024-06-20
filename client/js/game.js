@@ -9,4 +9,12 @@ let velocity = new THREE.Vector3();
 let direction = new THREE.Vector3();
 const jumpSpeed = 9.0;
 const gravity = 30.0;
-const clock
+const clock = new THREE.Clock();
+const pitchObject = new THREE.Object3D();
+const yawObject = new THREE.Object3D();
+const speed = 50.0;
+
+export function init() {
+    scene = new TREE.Sence();
+    camera = new THREE.
+} 
