@@ -15,9 +15,9 @@ const clock = new THREE.Clock();
 const pitchObject = new THREE.Object3D();
 const yawObject = new THREE.Object3D();
 const normalSpeed = 50.0;
-const crouchSpeed = 25.0; // しゃがみ時の速度
+const crouchSpeed = 20.0; // しゃがみ時の速度
 const normalHeight = 1.5; // 通常時の高さ
-const crouchHeight = 1.0; // しゃがみ時の高さ
+const crouchHeight = 1.1; // しゃがみ時の高さ
 
 // 初期化関数
 export function init() {
@@ -33,7 +33,10 @@ export function init() {
 
     yawObject.position.y = normalHeight;
 
-    renderer = new THREE.WebGLRenderer();
+    renderer = new THREE.WebGLRenderer({
+        canvas: document.querySelector('#FPSCanvas'),
+        antialias: true
+    });
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
@@ -47,6 +50,7 @@ export function init() {
     const loader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
+    renderer.setPixelRatio(window.devicePixelRatio);
     loader.setDRACOLoader(dracoLoader);
 
     loader.load(
@@ -204,6 +208,4 @@ export function animate() {
     yawObject.translateZ(velocity.z * delta);
 
     renderer.render(scene, camera);
-
-    console.log(`Y Position: ${yawObject.position.y}, isCrouching: ${isCrouching}`);
 }

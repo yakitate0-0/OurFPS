@@ -1,8 +1,7 @@
-/* styles.css */
 body {
     margin: 0;
     overflow: hidden;
-    cursor: none; /* カーソルを隠す */
+    cursor: none; 
 }
 
 #loading-screen {
@@ -15,12 +14,20 @@ body {
     align-items: center;
     color: white;
     font-size: 2em;
-    z-index: 1000; /* 他の要素より前面に表示 */
+    z-index: 1000; 
 }
 
 #loading-text {
     animation: blink 1s infinite;
 }
+#FPSCanvas {
+    width: 100vw; /* ビューポートの幅の100% */
+    height: 100vh; /* ビューポートの高さの100% */
+    display: block; /* ブラウザの標準スタイルリセット */
+    margin: 0; /* デフォルトのマージンをリセット */
+    padding: 0; /* デフォルトのパディングをリセット */
+}
+
 
 @keyframes blink {
     0%, 100% { opacity: 1; }
