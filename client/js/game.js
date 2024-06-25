@@ -19,6 +19,8 @@ const crouchSpeed = 20.0; // しゃがみ時の速度
 const normalHeight = 1.5; // 通常時の高さ
 const crouchHeight = 1.1; // しゃがみ時の高さ
 
+let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
+
 // 初期化関数
 export function init() {
     // ロード画面の表示
@@ -26,7 +28,7 @@ export function init() {
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-    
+
     pitchObject.add(camera);
     yawObject.add(pitchObject);
     scene.add(yawObject);
@@ -54,8 +56,97 @@ export function init() {
     loader.setDRACOLoader(dracoLoader);
 
     loader.load(
-        'assets/models/stage.glb',
+        'assets/models/wall.glb',
         function (gltf) {
+            const wall1 = gltf.scene.clone();
+            wall1.position.set(10, 0, -10); // 壁1の位置を設定
+            scene.add(wall1);
+            wall1.updateMatrixWorld(); // 位置を更新
+            wall1.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    wallBoxes.push(box);
+    
+                    // バウンディングボックスの可視化用
+                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    scene.add(boxHelper);
+                }
+            });
+    
+            const wall2 = gltf.scene.clone();
+            wall2.position.set(-10, 0, 10); // 壁2の位置を設定
+            scene.add(wall2);
+            wall2.updateMatrixWorld(); // 位置を更新
+            wall2.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    wallBoxes.push(box);
+    
+                    // バウンディングボックスの可視化用
+                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    scene.add(boxHelper);
+                }
+            });
+    
+            // ロード完了後にロード画面を非表示にする
+            hideLoadingScreen();
+        },
+        undefined,
+        function (error) {
+            console.error(error);
+            // エラーが発生してもロード画面を非表示にする
+            hideLoadingScreen();
+        }
+    );
+    
+    
+
+    loader.load(
+        'assets/models/warehouse.glb',
+        function (gltf) {
+            gltf.scene.position.set(20, 0, -20); // warahouseの位置を設定
+            scene.add(gltf.scene);
+        },
+        undefined,
+        function (error) {
+            console.error(error);
+            // エラーが発生してもロード画面を非表示にする
+            hideLoadingScreen();
+        }
+    );
+
+    loader.load(
+        'assets/models/house2.glb',
+        function (gltf) {
+            gltf.scene.position.set(-20, 0, 20); // house2の位置を設定
+            scene.add(gltf.scene);
+        },
+        undefined,
+        function (error) {
+            console.error(error);
+            // エラーが発生してもロード画面を非表示にする
+            hideLoadingScreen();
+        }
+    );
+
+    loader.load(
+        'assets/models/house1.glb',
+        function (gltf) {
+            gltf.scene.position.set(0, 0, 30); // house1の位置を設定
+            scene.add(gltf.scene);
+        },
+        undefined,
+        function (error) {
+            console.error(error);
+            // エラーが発生してもロード画面を非表示にする
+            hideLoadingScreen();
+        }
+    );
+
+    loader.load(
+        'assets/models/floor.glb',
+        function (gltf) {
+            gltf.scene.position.set(0, 0, 0); // floorの位置を設定
             scene.add(gltf.scene);
             // ロード完了後にロード画面を非表示にする
             hideLoadingScreen();
@@ -177,6 +268,7 @@ export function onKeyUp(event) {
 }
 
 // アニメーションループ
+// アニメーションループ
 export function animate() {
     requestAnimationFrame(animate);
 
@@ -196,9 +288,31 @@ export function animate() {
 
     velocity.y -= gravity * delta;
 
+    const oldPosition = yawObject.position.clone();
+
     yawObject.translateX(velocity.x * delta);
     yawObject.translateZ(velocity.z * delta);
     yawObject.position.y += velocity.y * delta;
+
+    // 衝突検出
+    const playerBox = new THREE.Box3().setFromCenterAndSize(
+        new THREE.Vector3(yawObject.position.x, yawObject.position.y - normalHeight / 2, yawObject.position.z),
+        new THREE.Vector3(1, normalHeight, 1)
+    );
+
+    let collisionDetected = false;
+
+    for (const box of wallBoxes) {
+        if (playerBox.intersectsBox(box)) {
+            collisionDetected = true;
+            break;
+        }
+    }
+
+    if (collisionDetected) {
+        yawObject.position.copy(oldPosition);
+        velocity.y = Math.min(0, velocity.y); // 落下を止める
+    }
 
     if (yawObject.position.y < normalHeight && velocity.y < 0) {
         yawObject.position.y = Math.max(crouchHeight, normalHeight);
