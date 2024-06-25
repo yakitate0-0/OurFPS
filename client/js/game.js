@@ -9,7 +9,6 @@ let isJumping = false;
 let isCrouching = false; // しゃがみ状態のフラグ
 let velocity = new THREE.Vector3();
 let direction = new THREE.Vector3();
-let walls = []; // 壁のバウンディングボックスを格納する配列
 const jumpSpeed = 9.0;
 const gravity = 30.0;
 const clock = new THREE.Clock();
@@ -27,7 +26,7 @@ export function init() {
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
-
+    
     pitchObject.add(camera);
     yawObject.add(pitchObject);
     scene.add(yawObject);
@@ -57,33 +56,17 @@ export function init() {
     loader.load(
         'assets/models/stage.glb',
         function (gltf) {
-            // walls 配列をクリア
-            walls.length = 0;
-    
             scene.add(gltf.scene);
-            gltf.scene.traverse(function (child) {
-                if (child.isMesh) {
-                    child.geometry.computeBoundingBox();
-                    // メッシュが見える場合のみバウンディングボックスを設定
-                    if (child.visible && child.material.opacity !== 0 && !child.name.toLowerCase().includes('floor')) {
-                        let box = new THREE.Box3().setFromObject(child);
-                        // 重複するバウンディングボックスを追加しない
-                        if (!walls.some(existingBox => existingBox.equals(box))) {
-                            walls.push(box);
-                            createBoundingBoxHelper(box, 0x00ff00); // 壁のバウンディングボックスを視覚化
-                        }
-                    }
-                }
-            });
+            // ロード完了後にロード画面を非表示にする
             hideLoadingScreen();
         },
         undefined,
         function (error) {
             console.error(error);
+            // エラーが発生してもロード画面を非表示にする
             hideLoadingScreen();
         }
     );
-    
 
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('keydown', onKeyDown, false);
@@ -193,39 +176,6 @@ export function onKeyUp(event) {
     console.log(`KeyUp: ${event.code}`); // デバッグ: キー解放イベント
 }
 
-// 衝突チェック関数
-function checkCollision(position) {
-    // キャラクターのバウンディングボックスのサイズと位置を調整
-    let playerBox = new THREE.Box3().setFromCenterAndSize(
-        new THREE.Vector3(position.x, position.y + normalHeight / 2, position.z), 
-        new THREE.Vector3(0.5, normalHeight, 0.5) // サイズを調整
-    );
-
-    // 視覚化を一時的に除外
-    // createBoundingBoxHelper(playerBox, 0xff0000);
-
-    for (let wall of walls) {
-        let wallBox = wall.clone(); // バウンディングボックスをコピー
-        // Y軸の高さを無視するためにY方向の範囲を広げる
-        wallBox.min.y = -Infinity;
-        wallBox.max.y = Infinity;
-        
-        if (playerBox.intersectsBox(wallBox)) {
-            console.log('Collision detected:', playerBox, wallBox); // デバッグ: 衝突の詳細をログ出力
-            return true; // 衝突あり
-        }
-    }
-    console.log('No collision:', playerBox); // デバッグ: 衝突なしの詳細をログ出力
-    return false; // 衝突なし
-}
-
-// バウンディングボックスを視覚化する関数
-function createBoundingBoxHelper(box3, color) {
-    const helper = new THREE.Box3Helper(box3, color);
-    scene.add(helper);
-    return helper;
-}
-
 // アニメーションループ
 export function animate() {
     requestAnimationFrame(animate);
@@ -246,23 +196,8 @@ export function animate() {
 
     velocity.y -= gravity * delta;
 
-    // 仮想的に移動先の位置を計算
-    let newPositionX = yawObject.position.clone().add(new THREE.Vector3(velocity.x * delta, 0, 0));
-    let newPositionZ = yawObject.position.clone().add(new THREE.Vector3(0, 0, velocity.z * delta));
-
-    // 衝突チェック
-    let canMoveX = !checkCollision(newPositionX);
-    let canMoveZ = !checkCollision(newPositionZ);
-
-    console.log(`canMoveX: ${canMoveX}, canMoveZ: ${canMoveZ}, yawObject.position: ${yawObject.position.x}, ${yawObject.position.y}, ${yawObject.position.z}`); // デバッグ: 衝突チェック
-
-    if (canMoveX) {
-        yawObject.translateX(velocity.x * delta); // X軸の移動
-    }
-    if (canMoveZ) {
-        yawObject.translateZ(velocity.z * delta); // Z軸の移動
-    }
-
+    yawObject.translateX(velocity.x * delta);
+    yawObject.translateZ(velocity.z * delta);
     yawObject.position.y += velocity.y * delta;
 
     if (yawObject.position.y < normalHeight && velocity.y < 0) {
@@ -270,6 +205,13 @@ export function animate() {
         velocity.y = 0;
         canJump = true;
         isJumping = false;
+    }
+
+    // しゃがみ状態を反映する
+    if (isCrouching && !isJumping) {
+        yawObject.position.y = crouchHeight;
+    } else if (!isJumping) {
+        yawObject.position.y = normalHeight;
     }
 
     renderer.render(scene, camera);
