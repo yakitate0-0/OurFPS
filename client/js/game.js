@@ -127,54 +127,54 @@ export function init() {
     );
 
     loader.load(
-    'assets/models/house2.glb',
-    function (gltf) {
-        gltf.scene.position.set(5, 0.01, -4); // house2の位置を設定
-        scene.add(gltf.scene);
-        gltf.scene.updateMatrixWorld(); // 位置を更新
-        gltf.scene.traverse(child => {
-            if (child.isMesh) {
-                const box = new THREE.Box3().setFromObject(child);
-                wallBoxes.push(box);
+        'assets/models/house2.glb',
+        function (gltf) {
+            gltf.scene.position.set(5, 0.01, -4); // house2の位置を設定
+            scene.add(gltf.scene);
+            gltf.scene.updateMatrixWorld(); // 位置を更新
+            gltf.scene.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    wallBoxes.push(box);
 
-                // バウンディングボックスの可視化用
-                const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                scene.add(boxHelper);
-            }
-        });
-    },
-    undefined,
-    function (error) {
-        console.error(error);
-        // エラーが発生してもロード画面を非表示にする
-        hideLoadingScreen();
-    }
-);
+                    // バウンディングボックスの可視化用
+                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    scene.add(boxHelper);
+                }
+            });
+        },
+        undefined,
+        function (error) {
+            console.error(error);
+            // エラーが発生してもロード画面を非表示にする
+            hideLoadingScreen();
+        }
+    );
 
-loader.load(
-    'assets/models/house1.glb',
-    function (gltf) {
-        gltf.scene.position.set(-4, 0.01, 2); // house1の位置を設定
-        scene.add(gltf.scene);
-        gltf.scene.updateMatrixWorld(); // 位置を更新
-        gltf.scene.traverse(child => {
-            if (child.isMesh) {
-                const box = new THREE.Box3().setFromObject(child);
-                wallBoxes.push(box);
+    loader.load(
+        'assets/models/house1.glb',
+        function (gltf) {
+            gltf.scene.position.set(-4, 0.01, 2); // house1の位置を設定
+            scene.add(gltf.scene);
+            gltf.scene.updateMatrixWorld(); // 位置を更新
+            gltf.scene.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    wallBoxes.push(box);
 
-                // バウンディングボックスの可視化用
-                const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                scene.add(boxHelper);
-            }
-        });
-    },
-    undefined,
-    function (error) {
-        console.error(error);
-        // エラーが発生してもロード画面を非表示にする
-        hideLoadingScreen();
-    }
-);
+                    // バウンディングボックスの可視化用
+                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    scene.add(boxHelper);
+                }
+            });
+        },
+        undefined,
+        function (error) {
+            console.error(error);
+            // エラーが発生してもロード画面を非表示にする
+            hideLoadingScreen();
+        }
+    );
 
 
 
@@ -194,6 +194,35 @@ loader.load(
         }
     );
 
+
+    const SIZE = 3000;
+    // 配置する個数
+    const LENGTH = 1000;
+    // 頂点情報を格納する配列
+    const vertices = [];
+    for (let i = 0; i < LENGTH; i++) {
+        const x = SIZE * (Math.random() - 0.5);
+        const y = SIZE * (Math.random() - 0.5);
+        const z = SIZE * (Math.random() - 0.5);
+
+        vertices.push(x, y, z);
+    }
+
+    // 形状データを作成
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+    // マテリアルを作成
+    const material = new THREE.PointsMaterial({
+        // 一つ一つのサイズ
+        size: 10,
+        // 色
+        color: 0xffffff,
+    });
+
+    // 物体を作成
+    const mesh = new THREE.Points(geometry, material);
+    scene.add(mesh);
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
