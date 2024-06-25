@@ -59,7 +59,7 @@ export function init() {
         'assets/models/wall.glb',
         function (gltf) {
             const wall1 = gltf.scene.clone();
-            wall1.position.set(4, 1, 5); // 壁1の位置を設定
+            wall1.position.set(4, 1, 6); // 壁1の位置を設定
             scene.add(wall1);
             wall1.updateMatrixWorld(); // 位置を更新
             wall1.traverse(child => {
@@ -74,7 +74,7 @@ export function init() {
             });
 
             const wall2 = gltf.scene.clone();
-            wall2.position.set(-4, 1, -5); // 壁2の位置を設定
+            wall2.position.set(-4, 1, -6); // 壁2の位置を設定
             scene.add(wall2);
             wall2.updateMatrixWorld(); // 位置を更新
             wall2.traverse(child => {
