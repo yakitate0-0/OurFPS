@@ -66,13 +66,13 @@ export function init() {
                 if (child.isMesh) {
                     const box = new THREE.Box3().setFromObject(child);
                     wallBoxes.push(box);
-    
+
                     // バウンディングボックスの可視化用
                     const boxHelper = new THREE.BoxHelper(child, 0xffff00);
                     scene.add(boxHelper);
                 }
             });
-    
+
             const wall2 = gltf.scene.clone();
             wall2.position.set(-4, 1, -5); // 壁2の位置を設定
             scene.add(wall2);
@@ -81,13 +81,13 @@ export function init() {
                 if (child.isMesh) {
                     const box = new THREE.Box3().setFromObject(child);
                     wallBoxes.push(box);
-    
+
                     // バウンディングボックスの可視化用
                     const boxHelper = new THREE.BoxHelper(child, 0xffff00);
                     scene.add(boxHelper);
                 }
             });
-    
+
             // ロード完了後にロード画面を非表示にする
             hideLoadingScreen();
         },
@@ -98,14 +98,25 @@ export function init() {
             hideLoadingScreen();
         }
     );
-    
-    
+
+
 
     loader.load(
         'assets/models/warehouse.glb',
         function (gltf) {
             gltf.scene.position.set(8, 0, 1.5); // warahouseの位置を設定
             scene.add(gltf.scene);
+            gltf.scene.updateMatrixWorld(); // 位置を更新
+            gltf.scene.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    wallBoxes.push(box);
+
+                    // バウンディングボックスの可視化用
+                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    scene.add(boxHelper);
+                }
+            });
         },
         undefined,
         function (error) {
@@ -120,6 +131,17 @@ export function init() {
         function (gltf) {
             gltf.scene.position.set(5, 0, -4); // house2の位置を設定
             scene.add(gltf.scene);
+            gltf.scene.updateMatrixWorld(); // 位置を更新
+            gltf.scene.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    wallBoxes.push(box);
+
+                    // バウンディングボックスの可視化用
+                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    scene.add(boxHelper);
+                }
+            });
         },
         undefined,
         function (error) {
@@ -134,6 +156,17 @@ export function init() {
         function (gltf) {
             gltf.scene.position.set(-4, 0, 2); // house1の位置を設定
             scene.add(gltf.scene);
+            gltf.scene.updateMatrixWorld(); // 位置を更新
+            gltf.scene.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    wallBoxes.push(box);
+
+                    // バウンディングボックスの可視化用
+                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    scene.add(boxHelper);
+                }
+            });
         },
         undefined,
         function (error) {
@@ -142,6 +175,7 @@ export function init() {
             hideLoadingScreen();
         }
     );
+
 
     loader.load(
         'assets/models/floor.glb',
