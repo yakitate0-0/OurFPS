@@ -14,7 +14,7 @@ const gravity = 30.0;
 const clock = new THREE.Clock();
 const pitchObject = new THREE.Object3D();
 const yawObject = new THREE.Object3D();
-const normalSpeed = 50.0;
+const normalSpeed = 60.0;
 const crouchSpeed = 20.0; // しゃがみ時の速度
 const normalHeight = 1.5; // 通常時の高さ
 const crouchHeight = 1.1; // しゃがみ時の高さ
@@ -59,7 +59,7 @@ export function init() {
         'assets/models/wall.glb',
         function (gltf) {
             const wall1 = gltf.scene.clone();
-            wall1.position.set(10, 0, -10); // 壁1の位置を設定
+            wall1.position.set(4, 1, 5); // 壁1の位置を設定
             scene.add(wall1);
             wall1.updateMatrixWorld(); // 位置を更新
             wall1.traverse(child => {
@@ -74,7 +74,7 @@ export function init() {
             });
     
             const wall2 = gltf.scene.clone();
-            wall2.position.set(-10, 0, 10); // 壁2の位置を設定
+            wall2.position.set(-4, 1, -5); // 壁2の位置を設定
             scene.add(wall2);
             wall2.updateMatrixWorld(); // 位置を更新
             wall2.traverse(child => {
@@ -104,7 +104,7 @@ export function init() {
     loader.load(
         'assets/models/warehouse.glb',
         function (gltf) {
-            gltf.scene.position.set(20, 0, -20); // warahouseの位置を設定
+            gltf.scene.position.set(8, 0, 1.5); // warahouseの位置を設定
             scene.add(gltf.scene);
         },
         undefined,
@@ -118,7 +118,7 @@ export function init() {
     loader.load(
         'assets/models/house2.glb',
         function (gltf) {
-            gltf.scene.position.set(-20, 0, 20); // house2の位置を設定
+            gltf.scene.position.set(5, 0, -4); // house2の位置を設定
             scene.add(gltf.scene);
         },
         undefined,
@@ -132,7 +132,7 @@ export function init() {
     loader.load(
         'assets/models/house1.glb',
         function (gltf) {
-            gltf.scene.position.set(0, 0, 30); // house1の位置を設定
+            gltf.scene.position.set(-4, 0, 2); // house1の位置を設定
             scene.add(gltf.scene);
         },
         undefined,
