@@ -332,7 +332,6 @@ export function onKeyUp(event) {
 }
 
 // アニメーションループ
-// アニメーションループ
 export function animate() {
     requestAnimationFrame(animate);
 
