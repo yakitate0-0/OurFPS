@@ -32,6 +32,15 @@ export function init() {
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
+    // スポットライトの初期化
+    spotLight = new THREE.SpotLight(0xffffff, 2, 100, Math.PI / 6, 0.1, 1);
+    spotLight.position.set(0, 0, 0);
+    spotLight.target.position.set(0, 0, -1);
+    spotLight.visible = false; // 初期状態はオフ
+
+    camera.add(spotLight);
+    camera.add(spotLight.target);
+
     pitchObject.add(camera);
     yawObject.add(pitchObject);
     scene.add(yawObject);
@@ -49,12 +58,7 @@ export function init() {
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
     scene.add(ambientLight);
 
-    // スポットライトの初期化
-    spotLight = new THREE.SpotLight(0xffffff, 2, 100, Math.PI / 6, 0.1, 1);
-    spotLight.position.set(0, normalHeight, 0);
-    yawObject.add(spotLight);
-    yawObject.add(spotLight.target);
-    spotLight.visible = false; // 初期状態はオフ
+
 
 
     const loader = new GLTFLoader();
@@ -89,8 +93,8 @@ export function init() {
                     wallBoxes.push(box);
 
                     // バウンディングボックスの可視化用
-                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                    scene.add(boxHelper);
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
                     // マテリアルの設定を確認
                     child.material = new THREE.MeshStandardMaterial({
@@ -112,8 +116,8 @@ export function init() {
                     wallBoxes.push(box);
 
                     // バウンディングボックスの可視化用
-                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                    scene.add(boxHelper);
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
                     // マテリアルの設定を確認
                     child.material = new THREE.MeshStandardMaterial({
@@ -141,8 +145,8 @@ export function init() {
                     wallBoxes.push(box);
 
                     // バウンディングボックスの可視化用
-                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                    scene.add(boxHelper);
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
                     // マテリアルの設定を確認
                     child.material = new THREE.MeshStandardMaterial({
@@ -170,8 +174,8 @@ export function init() {
                     wallBoxes.push(box);
 
                     // バウンディングボックスの可視化用
-                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                    scene.add(boxHelper);
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
                     // マテリアルの設定を確認
                     child.material = new THREE.MeshStandardMaterial({
@@ -199,8 +203,8 @@ export function init() {
                     wallBoxes.push(box);
 
                     // バウンディングボックスの可視化用
-                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                    scene.add(boxHelper);
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
                     // マテリアルの設定を確認
                     child.material = new THREE.MeshStandardMaterial({
@@ -423,14 +427,6 @@ export function animate() {
         yawObject.position.y = normalHeight;
     }
 
-    // スポットライトの位置とターゲットをカメラに追従させる
-    spotLight.position.copy(camera.position);
-    spotLight.target.position.set(
-        camera.position.x + Math.sin(yawObject.rotation.y),
-        camera.position.y + Math.sin(pitchObject.rotation.x),
-        camera.position.z + Math.cos(yawObject.rotation.y)
-    );
-    spotLight.target.updateMatrixWorld();
 
     renderer.render(scene, camera);
 }
