@@ -58,7 +58,7 @@ export function init() {
     renderer.domElement.style.position = 'absolute'; // 追加: canvasの位置を絶対位置に設定
     renderer.domElement.style.top = '0'; // 追加: canvasのトップ位置を0に設定
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
     scene.add(ambientLight);
 
 
