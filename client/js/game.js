@@ -22,6 +22,8 @@ const crouchSpeed = 20.0; // しゃがみ時の速度
 const normalHeight = 1.5; // 通常時の高さ
 const crouchHeight = 1.1; // しゃがみ時の高さ
 const lightSize = 6;
+const FLOOR_SIZE_x = 26;
+const FLOOR_SIZE_z = 20;
 
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
@@ -60,9 +62,6 @@ export function init() {
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
     scene.add(ambientLight);
-
-
-
 
     const loader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
@@ -395,6 +394,15 @@ export function animate() {
     yawObject.translateX(velocity.x * delta);
     yawObject.translateZ(velocity.z * delta);
     yawObject.position.y += velocity.y * delta;
+
+    const halfFloorSize_x = FLOOR_SIZE_x / 2;
+    const halfFloorSize_z = FLOOR_SIZE_z / 2;
+    if (Math.abs(yawObject.position.x) > halfFloorSize_x || Math.abs(yawObject.position.z) > halfFloorSize_z) {
+        yawObject.position.copy(oldPosition);
+        velocity.x = 0;
+        velocity.z = 0;
+    }
+
 
     // 衝突検出
     const playerBox = new THREE.Box3().setFromCenterAndSize(
