@@ -21,6 +21,7 @@ const normalSpeed = 60.0;
 const crouchSpeed = 20.0; // しゃがみ時の速度
 const normalHeight = 1.5; // 通常時の高さ
 const crouchHeight = 1.1; // しゃがみ時の高さ
+const lightSize = 6;
 
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
@@ -33,7 +34,7 @@ export function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     // スポットライトの初期化
-    spotLight = new THREE.SpotLight(0xffffff, 2, 100, Math.PI / 6, 0.1, 1);
+    spotLight = new THREE.SpotLight(0xffffff, 3, 100, Math.PI / lightSize, 0.1, 1);
     spotLight.position.set(0, 0, 0);
     spotLight.target.position.set(0, 0, -1);
     spotLight.visible = false; // 初期状態はオフ
@@ -426,7 +427,6 @@ export function animate() {
     } else if (!isJumping) {
         yawObject.position.y = normalHeight;
     }
-
 
     renderer.render(scene, camera);
 }
