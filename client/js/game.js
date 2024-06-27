@@ -9,6 +9,9 @@ let isJumping = false;
 let isCrouching = false; // しゃがみ状態のフラグ
 let velocity = new THREE.Vector3();
 let direction = new THREE.Vector3();
+let flashlight = 0;
+let loadedModels = 0;
+const totalModels = 5; // 読み込むモデルの総数
 const jumpSpeed = 9.0;
 const gravity = 30.0;
 const clock = new THREE.Clock();
@@ -20,13 +23,12 @@ const normalHeight = 1.5; // 通常時の高さ
 const crouchHeight = 1.1; // しゃがみ時の高さ
 
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
-let spotLight; // 懐中電灯のようなライト
-
-let loadedModels = 0; // ロードされたモデルの数
-const totalModels = 5; // ロードするモデルの総数
 
 // 初期化関数
 export function init() {
+    // ロード画面の表示
+    showLoadingScreen();
+
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
@@ -44,23 +46,21 @@ export function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // 懐中電灯のようなスポットライトを追加
-    spotLight = new THREE.SpotLight(0xffffff, 1.5);
-    spotLight.angle = Math.PI / 8;
-    spotLight.distance = 100;
-    spotLight.penumbra = 0.5;
-    spotLight.decay = 2;
-    spotLight.position.set(0, normalHeight, 0); // カメラ位置に合わせる
-    scene.add(spotLight);
+    // const ambientLight = new THREE.AmbientLight(0xffffff, 3.5);
+    // scene.add(ambientLight);
 
-    // スポットライトのヘルパーを追加（デバッグ用）
-    const spotLightHelper = new THREE.SpotLightHelper(spotLight);
-    scene.add(spotLightHelper);
+    flashlight = new THREE.DirectionalLight(0xffffff, 3);
+    flashlight.position.set(0, 0, 1); // カメラの前方に配置
+    flashlight.target.position.set(0, 0, 0);
+    scene.add(flashlight);
+    scene.add(flashlight.target);
+    flashlight.visible = false; // 初期状態はオフ
 
     const loader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
     loader.setDRACOLoader(dracoLoader);
+
 
     function onProgress(xhr) {
         if (xhr.lengthComputable) {
@@ -68,6 +68,7 @@ export function init() {
             document.getElementById('loading-text').innerText = `Loading: ${percentComplete}%`;
         }
     }
+    
 
     function modelLoaded() {
         loadedModels++;
@@ -75,6 +76,7 @@ export function init() {
             hideLoadingScreen();
         }
     }
+    
 
     loader.load(
         'assets/models/wall.glb',
@@ -227,10 +229,39 @@ export function init() {
         onProgress
     );
 
+
+    const SIZE = 3000;
+    // 配置する個数
+    const LENGTH = 1000;
+    // 頂点情報を格納する配列
+    const vertices = [];
+    for (let i = 0; i < LENGTH; i++) {
+        const x = SIZE * (Math.random() - 0.5);
+        const y = SIZE * (Math.random() - 0.5);
+        const z = SIZE * (Math.random() - 0.5);
+
+        vertices.push(x, y, z);
+    }
+
+    // 形状データを作成
+    const geometry = new THREE.BufferGeometry();
+    geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
+
+    // マテリアルを作成
+    const material = new THREE.PointsMaterial({
+        // 一つ一つのサイズ
+        size: 10,
+        // 色
+        color: 0xffffff,
+    });
+
+    // 物体を作成
+    const mesh = new THREE.Points(geometry, material);
+    scene.add(mesh);
     document.addEventListener('mousemove', onMouseMove, false);
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
-    document.addEventListener('mousedown', onMouseDown, false); // 右クリックイベントリスナーを追加
+    document.addEventListener('mousedown', onMouseDown, false);
 
     window.addEventListener('resize', onWindowResize, false);
 
@@ -276,15 +307,6 @@ export function onMouseMove(event) {
         pitchObject.rotation.x -= movementY * 0.002;
 
         pitchObject.rotation.x = Math.max(-Math.PI / 2, Math.min(Math.PI / 2, pitchObject.rotation.x));
-
-        // スポットライトの方向をカメラに合わせる
-        spotLight.position.copy(camera.position);
-        spotLight.target.position.set(
-            camera.position.x + Math.sin(yawObject.rotation.y),
-            camera.position.y,
-            camera.position.z + Math.cos(yawObject.rotation.y)
-        );
-        spotLight.target.updateMatrixWorld();
     }
 }
 
@@ -345,10 +367,9 @@ export function onKeyUp(event) {
     console.log(`KeyUp: ${event.code}`); // デバッグ: キー解放イベント
 }
 
-// マウスダウンの処理
-export function onMouseDown(event) {
+function onMouseDown(event) {
     if (event.button === 2) { // 右クリック
-        spotLight.visible = !spotLight.visible; // 懐中電灯のON/OFF
+        flashlight.visible = !flashlight.visible; // ライトのオンオフを切り替える
     }
 }
 
@@ -411,6 +432,13 @@ export function animate() {
     } else if (!isJumping) {
         yawObject.position.y = normalHeight;
     }
+
+    flashlight.position.copy(camera.position);
+    flashlight.target.position.set(
+        camera.position.x + Math.sin(yawObject.rotation.y),
+        camera.position.y + Math.sin(pitchObject.rotation.x),
+        camera.position.z + Math.cos(yawObject.rotation.y)
+    );
 
     renderer.render(scene, camera);
 }
