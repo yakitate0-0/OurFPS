@@ -34,7 +34,7 @@ export function init() {
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
 
     // スポットライトの初期化
-    spotLight = new THREE.SpotLight(0xffffff, 3, 100, Math.PI / lightSize, 0.1, 1);
+    spotLight = new THREE.SpotLight(0xffffff, 3.5, 100, Math.PI / lightSize, 0.1, 1);
     spotLight.position.set(0, 0, 0);
     spotLight.target.position.set(0, 0, -1);
     spotLight.visible = false; // 初期状態はオフ
@@ -55,6 +55,8 @@ export function init() {
     renderer.setPixelRatio(window.devicePixelRatio);
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
+    renderer.domElement.style.position = 'absolute'; // 追加: canvasの位置を絶対位置に設定
+    renderer.domElement.style.top = '0'; // 追加: canvasのトップ位置を0に設定
 
     const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
     scene.add(ambientLight);

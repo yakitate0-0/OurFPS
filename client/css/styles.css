@@ -2,10 +2,13 @@ body {
     margin: 0;
     overflow: hidden;
     cursor: none;
+    height: 100vh; /* 追加: ビューポートの高さを指定 */
 }
 
 canvas {
     display: block;
+    margin: 0;
+    padding: 0;
 }
 
 #loading-screen {
