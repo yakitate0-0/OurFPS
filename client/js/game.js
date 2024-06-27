@@ -9,7 +9,7 @@ let isJumping = false;
 let isCrouching = false; // しゃがみ状態のフラグ
 let velocity = new THREE.Vector3();
 let direction = new THREE.Vector3();
-let flashlight = 0;
+let spotLight;
 let loadedModels = 0;
 const totalModels = 5; // 読み込むモデルの総数
 const jumpSpeed = 9.0;
@@ -46,21 +46,21 @@ export function init() {
     renderer.setSize(window.innerWidth, window.innerHeight);
     document.body.appendChild(renderer.domElement);
 
-    // const ambientLight = new THREE.AmbientLight(0xffffff, 3.5);
-    // scene.add(ambientLight);
+    const ambientLight = new THREE.AmbientLight(0xffffff, 0.2);
+    scene.add(ambientLight);
 
-    flashlight = new THREE.DirectionalLight(0xffffff, 3);
-    flashlight.position.set(0, 0, 1); // カメラの前方に配置
-    flashlight.target.position.set(0, 0, 0);
-    scene.add(flashlight);
-    scene.add(flashlight.target);
-    flashlight.visible = false; // 初期状態はオフ
+    // スポットライトの初期化
+    spotLight = new THREE.SpotLight(0xffffff, 2, 100, Math.PI / 6, 0.1, 1);
+    spotLight.position.set(0, normalHeight, 0);
+    yawObject.add(spotLight);
+    yawObject.add(spotLight.target);
+    spotLight.visible = false; // 初期状態はオフ
+
 
     const loader = new GLTFLoader();
     const dracoLoader = new DRACOLoader();
     dracoLoader.setDecoderPath('https://www.gstatic.com/draco/versioned/decoders/1.4.1/');
     loader.setDRACOLoader(dracoLoader);
-
 
     function onProgress(xhr) {
         if (xhr.lengthComputable) {
@@ -68,7 +68,6 @@ export function init() {
             document.getElementById('loading-text').innerText = `Loading: ${percentComplete}%`;
         }
     }
-    
 
     function modelLoaded() {
         loadedModels++;
@@ -76,7 +75,6 @@ export function init() {
             hideLoadingScreen();
         }
     }
-    
 
     loader.load(
         'assets/models/wall.glb',
@@ -229,11 +227,8 @@ export function init() {
         onProgress
     );
 
-
     const SIZE = 3000;
-    // 配置する個数
     const LENGTH = 1000;
-    // 頂点情報を格納する配列
     const vertices = [];
     for (let i = 0; i < LENGTH; i++) {
         const x = SIZE * (Math.random() - 0.5);
@@ -243,19 +238,14 @@ export function init() {
         vertices.push(x, y, z);
     }
 
-    // 形状データを作成
     const geometry = new THREE.BufferGeometry();
     geometry.setAttribute('position', new THREE.Float32BufferAttribute(vertices, 3));
 
-    // マテリアルを作成
     const material = new THREE.PointsMaterial({
-        // 一つ一つのサイズ
         size: 10,
-        // 色
         color: 0xffffff,
     });
 
-    // 物体を作成
     const mesh = new THREE.Points(geometry, material);
     scene.add(mesh);
     document.addEventListener('mousemove', onMouseMove, false);
@@ -369,7 +359,7 @@ export function onKeyUp(event) {
 
 function onMouseDown(event) {
     if (event.button === 2) { // 右クリック
-        flashlight.visible = !flashlight.visible; // ライトのオンオフを切り替える
+        spotLight.visible = !spotLight.visible; // ライトのオンオフを切り替える
     }
 }
 
@@ -433,12 +423,14 @@ export function animate() {
         yawObject.position.y = normalHeight;
     }
 
-    flashlight.position.copy(camera.position);
-    flashlight.target.position.set(
+    // スポットライトの位置とターゲットをカメラに追従させる
+    spotLight.position.copy(camera.position);
+    spotLight.target.position.set(
         camera.position.x + Math.sin(yawObject.rotation.y),
         camera.position.y + Math.sin(pitchObject.rotation.x),
         camera.position.z + Math.cos(yawObject.rotation.y)
     );
+    spotLight.target.updateMatrixWorld();
 
     renderer.render(scene, camera);
 }
