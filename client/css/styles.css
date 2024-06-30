@@ -11,6 +11,16 @@ canvas {
     padding: 0;
 }
 
+#aming{
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    font-size: 24px;
+    color: red; /* 照準の色 */
+    pointer-events: none; /* 照準がクリックを受け付けないようにする */
+}
+
 #loading-screen {
     display: flex;
     justify-content: center;
