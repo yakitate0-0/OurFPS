@@ -57,7 +57,7 @@ canvas {
 
 #aiming img {
     width: 50px; /* 照準画像の幅を指定 */
-    height: 50px; /* 照準画像の高さを指定 */
+    height: auto; /* 照準画像の高さを指定 */
 }
 
 
