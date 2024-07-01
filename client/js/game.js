@@ -12,6 +12,12 @@ let direction = new THREE.Vector3();
 let spotLight;
 let loadedModels = 0;
 let gunModel;
+let isShooting = false;
+let ammo = 50;
+let isReloading = false;
+let lastShotTime = 0;
+const fireRate = 100; // 連射の間隔（ミリ秒）
+const reloadTime = 2000; // リロード時間（ミリ秒）
 const totalModels = 5; // 読み込むモデルの総数
 const jumpSpeed = 9.0;
 const gravity = 30.0;
@@ -26,6 +32,8 @@ const lightSize = 6;
 const FLOOR_SIZE_x = 26;
 const FLOOR_SIZE_z = 20;
 const nomalLight = 1;
+const shoot_sound = new Audio("/assets/sounds/shoot.mp3");
+const reload_sound = new Audio("/assets/sounds/reload.mp3");
 
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
@@ -305,6 +313,7 @@ export function init() {
     document.addEventListener('keydown', onKeyDown, false);
     document.addEventListener('keyup', onKeyUp, false);
     document.addEventListener('mousedown', onMouseDown, false);
+    document.addEventListener('mouseup', onMouseUp, false);
 
     window.addEventListener('resize', onWindowResize, false);
 
@@ -410,15 +419,55 @@ export function onKeyUp(event) {
 }
 
 function onMouseDown(event) {
-    if (event.button === 2) { // 右クリック
-        spotLight.visible = !spotLight.visible; // ライトのオンオフを切り替える
+    if (event.button === 0) { // 左クリック
+        isShooting = true;
+        shoot(); // 即座に1発目を発射
+    } else if (event.button === 2) { // 右クリック
+        spotLight.visible = !spotLight.visible;
+    }
+}
+
+function onMouseUp(event) {
+    if (event.button === 0) { // 左クリック
+        isShooting = false;
+    }
+}
+
+function shoot() {
+    if (ammo > 0 && !isReloading) {
+        shoot_sound.currentTime = 0;
+        shoot_sound.play();
+        console.log("Bang!"); // 実際の発砲処理をここに追加
+        ammo--;
+        applyRecoil();
+        if (ammo === 0) {
+            reload();
+        }
+    }
+}
+
+function applyRecoil() {
+    // リコイルの実装（上向きに修正）
+    const recoilAmount = 0.05;
+    pitchObject.rotation.x += recoilAmount; // マイナスからプラスに変更
+    yawObject.rotation.y += (Math.random() - 0.5) * recoilAmount * 0.5; // 左右のブレを少し小さくする
+}
+
+function reload() {
+    if (!isReloading) {
+        isReloading = true;
+        console.log("Reloading...");
+        reload_sound.currentTime = 0;
+        reload_sound.play();
+        setTimeout(() => {
+            ammo = 50;
+            isReloading = false;
+            console.log("Reload complete!");
+        }, reloadTime);
     }
 }
 
 function updateGunPosition() {
-    // 銃の位置をカメラの少し前に設定
-    // gunModel.position.set(0.5, 1, -1); // カメラからの相対位置を設定
-    // gunModel.rotation.set(0, Math.PI, 0); // 銃の向きを調整（必要に応じて調整）
 
     console.log("called");
     console.log(`Gun Position - X: ${gunModel.position.x}, Y: ${gunModel.position.y}, Z: ${gunModel.position.z}`);
@@ -432,6 +481,7 @@ export function animate() {
     requestAnimationFrame(animate);
 
     const delta = clock.getDelta();
+    const currentTime = Date.now();
 
     velocity.x -= velocity.x * 10.0 * delta;
     velocity.z -= velocity.z * 10.0 * delta;
@@ -494,6 +544,11 @@ export function animate() {
         yawObject.position.y = crouchHeight;
     } else if (!isJumping) {
         yawObject.position.y = normalHeight;
+    }
+
+    if (isShooting && currentTime - lastShotTime > fireRate) {
+        shoot();
+        lastShotTime = currentTime;
     }
 
     updateGunPosition()// 銃の位置を更新
