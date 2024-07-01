@@ -11,6 +11,7 @@ let velocity = new THREE.Vector3();
 let direction = new THREE.Vector3();
 let spotLight;
 let loadedModels = 0;
+let gunModel;
 const totalModels = 5; // 読み込むモデルの総数
 const jumpSpeed = 9.0;
 const gravity = 30.0;
@@ -24,6 +25,7 @@ const crouchHeight = 1.1; // しゃがみ時の高さ
 const lightSize = 6;
 const FLOOR_SIZE_x = 26;
 const FLOOR_SIZE_z = 20;
+const nomalLight = 1;
 
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
@@ -60,7 +62,7 @@ export function init() {
     renderer.domElement.style.position = 'absolute'; // 追加: canvasの位置を絶対位置に設定
     renderer.domElement.style.top = '0'; // 追加: canvasのトップ位置を0に設定
 
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.1);
+    const ambientLight = new THREE.AmbientLight(0xffffff, nomalLight);
     scene.add(ambientLight);
 
     const loader = new GLTFLoader();
@@ -248,9 +250,8 @@ export function init() {
     loader.load(
         'assets/models/gun.glb',
         function (gltf) {
-            const gunModel = gltf.scene;
-            gunModel.position.set(1, 1, 1);
-            gunModel.scale.set(1, 1, 1);
+            gunModel = gltf.scene;
+            gunModel.scale.set(0.5, 0.5, 0.5);
 
             gunModel.traverse((child) => {
                 if (child.isMesh) {
@@ -258,17 +259,19 @@ export function init() {
                     const texture = child.material.map;
 
                     // 光の影響を受けないマテリアルに変更
-                    child.material = new THREE.MeshBasicMaterial({
+                    child.material = new THREE.MeshStandardMaterial({
                         map: texture,
-                        color: 0xffffff, // 白色でテクスチャを表示
-                        emissive: 0x111111, // 多少の発光を持たせる
-                        emissiveIntensity: 0.1, // 発光の強さを調整
+                        color: 0x005243, // 黒色
+                        metalness: 1.0, // 金属っぽさ
+                        roughness: 0.2 // 表面の粗さを調整
                     });
                 }
             });
 
             // カメラに追加してプレイヤー視点にする
-            scene.add(gunModel);
+            camera.add(gunModel);
+            gunModel.position.set(1, -0.5, -1); // カメラからの相対位置を設定
+            gunModel.rotation.set(0, Math.PI * 3 / 2, 0); // 銃の向きを調整（必要に応じて調整）
             modelLoaded();
         },
         onProgress
@@ -377,7 +380,6 @@ export function onKeyDown(event) {
             }
             break;
     }
-    console.log(`KeyDown: ${event.code}`); // デバッグ: キー押下イベント
 }
 
 // キーボードの解放処理
@@ -402,13 +404,24 @@ export function onKeyUp(event) {
             }
             break;
     }
-    console.log(`KeyUp: ${event.code}`); // デバッグ: キー解放イベント
 }
 
 function onMouseDown(event) {
     if (event.button === 2) { // 右クリック
         spotLight.visible = !spotLight.visible; // ライトのオンオフを切り替える
     }
+}
+
+function updateGunPosition() {
+    // 銃の位置をカメラの少し前に設定
+    // gunModel.position.set(0.5, 1, -1); // カメラからの相対位置を設定
+    // gunModel.rotation.set(0, Math.PI, 0); // 銃の向きを調整（必要に応じて調整）
+
+    console.log("called");
+    console.log(`Gun Position - X: ${gunModel.position.x}, Y: ${gunModel.position.y}, Z: ${gunModel.position.z}`);
+
+
+    gunModel.updateMatrixWorld();
 }
 
 // アニメーションループ
@@ -479,6 +492,8 @@ export function animate() {
     } else if (!isJumping) {
         yawObject.position.y = normalHeight;
     }
+
+    updateGunPosition()// 銃の位置を更新
 
     renderer.render(scene, camera);
 }
