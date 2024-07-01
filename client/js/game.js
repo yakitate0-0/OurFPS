@@ -233,6 +233,17 @@ export function init() {
         onProgress
     );
 
+    loader.load(
+        'assets/models/bear.glb',
+        function (gltf) {
+            gltf.scene.position.set(3, 3, 2); 
+            scene.add(gltf.scene);
+            // ロード完了後にロード画面を非表示にする
+            modelLoaded();
+        },
+        onProgress
+    );
+
     const SIZE = 3000;
     const LENGTH = 1000;
     const vertices = [];
