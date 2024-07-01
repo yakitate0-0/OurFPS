@@ -33,6 +33,7 @@ let wallBoxes = []; // 壁のバウンディングボックスを格納する配
 export function init() {
     // ロード画面の表示
     showLoadingScreen();
+    document.getElementById('aiming').style.display = 'none';
 
     scene = new THREE.Scene();
     camera = new THREE.PerspectiveCamera(75, window.innerWidth / window.innerHeight, 0.1, 1000);
@@ -81,6 +82,7 @@ export function init() {
         loadedModels++;
         if (loadedModels === totalModels) {
             hideLoadingScreen();
+            document.getElementById('aiming').style.display = 'block';
         }
     }
 
@@ -329,6 +331,7 @@ function hideLoadingScreen() {
     if (loadingScreen) {
         loadingScreen.style.display = 'none'; // 非表示
     }
+    document.getElementById('aiming').style.display = 'block';
 }
 
 // ウィンドウサイズ変更の処理

@@ -2,23 +2,14 @@ body {
     margin: 0;
     overflow: hidden;
     cursor: none;
-    height: 100vh; /* 追加: ビューポートの高さを指定 */
+    height: 100vh;
+    /* 追加: ビューポートの高さを指定 */
 }
 
 canvas {
     display: block;
     margin: 0;
     padding: 0;
-}
-
-#aming{
-    position: fixed;
-    left: 50%;
-    top: 50%;
-    transform: translate(-50%, -50%);
-    font-size: 24px;
-    color: red; /* 照準の色 */
-    pointer-events: none; /* 照準がクリックを受け付けないようにする */
 }
 
 #loading-screen {
@@ -52,6 +43,23 @@ canvas {
     padding: 0;
     /* デフォルトのパディングをリセット */
 }
+
+#aiming {
+    position: fixed;
+    left: 50%;
+    top: 50%;
+    transform: translate(-50%, -50%);
+    pointer-events: none;
+    /* 照準がクリックを受け付けないようにする */
+    z-index: 1001;
+    /* ローディング画面の上に表示されるようにする */
+}
+
+#aiming img {
+    width: 50px; /* 照準画像の幅を指定 */
+    height: 50px; /* 照準画像の高さを指定 */
+}
+
 
 
 @keyframes blink {
