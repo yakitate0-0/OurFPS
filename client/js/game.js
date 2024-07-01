@@ -234,9 +234,10 @@ export function init() {
     );
 
     loader.load(
-        'assets/models/bear.glb',
+        'assets/models/bear_nomal.glb',
         function (gltf) {
-            gltf.scene.position.set(3, 3, 2); 
+            gltf.scene.position.set(3, 1.4, 2); 
+            gltf.scene.scale.set(0.5, 0.5, 0.5);
             scene.add(gltf.scene);
             // ロード完了後にロード画面を非表示にする
             modelLoaded();
