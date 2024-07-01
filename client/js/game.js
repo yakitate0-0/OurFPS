@@ -236,7 +236,7 @@ export function init() {
     loader.load(
         'assets/models/bear_nomal.glb',
         function (gltf) {
-            gltf.scene.position.set(3, 1.4, 2); 
+            gltf.scene.position.set(3, 1.4, 2);
             gltf.scene.scale.set(0.5, 0.5, 0.5);
             scene.add(gltf.scene);
             // ロード完了後にロード画面を非表示にする
@@ -244,6 +244,36 @@ export function init() {
         },
         onProgress
     );
+
+    loader.load(
+        'assets/models/gun.glb',
+        function (gltf) {
+            const gunModel = gltf.scene;
+            gunModel.position.set(1, 1, 1);
+            gunModel.scale.set(1, 1, 1);
+
+            gunModel.traverse((child) => {
+                if (child.isMesh) {
+                    // 現在のマテリアルのテクスチャを取得
+                    const texture = child.material.map;
+
+                    // 光の影響を受けないマテリアルに変更
+                    child.material = new THREE.MeshBasicMaterial({
+                        map: texture,
+                        color: 0xffffff, // 白色でテクスチャを表示
+                        emissive: 0x111111, // 多少の発光を持たせる
+                        emissiveIntensity: 0.1, // 発光の強さを調整
+                    });
+                }
+            });
+
+            // カメラに追加してプレイヤー視点にする
+            scene.add(gunModel);
+            modelLoaded();
+        },
+        onProgress
+    );
+
 
     const SIZE = 3000;
     const LENGTH = 1000;
