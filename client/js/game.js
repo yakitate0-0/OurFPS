@@ -34,6 +34,8 @@ const FLOOR_SIZE_z = 20;
 const nomalLight = 1;
 const shoot_sound = new Audio("/assets/sounds/shoot.mp3");
 const reload_sound = new Audio("/assets/sounds/reload.mp3");
+const ready_sound = new Audio("/assets/sounds/ready.mp3");
+const set_sound = new Audio("/assets/sounds/set.mp3");
 
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
@@ -415,6 +417,9 @@ export function onKeyUp(event) {
                 yawObject.position.y = normalHeight; // 直接高さを変更
             }
             break;
+        case 'KeyR':
+            reload();
+            break;
     }
 }
 
@@ -459,10 +464,12 @@ function reload() {
         console.log("Reloading...");
         reload_sound.currentTime = 0;
         reload_sound.play();
+        set_sound.play();
         setTimeout(() => {
             ammo = 50;
             isReloading = false;
             console.log("Reload complete!");
+            ready_sound.play();
         }, reloadTime);
     }
 }
