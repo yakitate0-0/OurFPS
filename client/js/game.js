@@ -16,6 +16,7 @@ let isShooting = false;
 let ammo = 50;
 let isReloading = false;
 let lastShotTime = 0;
+const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
 const reloadTime = 2000; // リロード時間（ミリ秒）
 const totalModels = 5; // 読み込むモデルの総数
@@ -474,17 +475,10 @@ function reload() {
     }
 }
 
-function updateGunPosition() {
-
-    console.log("called");
-    console.log(`Gun Position - X: ${gunModel.position.x}, Y: ${gunModel.position.y}, Z: ${gunModel.position.z}`);
-
-
-    gunModel.updateMatrixWorld();
-}
 
 // アニメーションループ
 export function animate() {
+
     requestAnimationFrame(animate);
 
     const delta = clock.getDelta();
@@ -558,7 +552,26 @@ export function animate() {
         lastShotTime = currentTime;
     }
 
-    updateGunPosition()// 銃の位置を更新
+    let cameraPosition = {
+        x: camera.position.x,
+        y: camera.position.y,
+        z: camera.position.z
+    };
+
+    let cameraRotation = {
+        x: camera.rotation.x,
+        y: camera.rotation.y,
+        z: camera.rotation.z
+    };
+
+    socket.emit('enemyPosition', {
+        position: cameraPosition,
+        rotation: cameraRotation
+    });
+
+    if (gunModel) {
+        gunModel.updateMatrixWorld();// 銃の位置を更新
+    }
 
     renderer.render(scene, camera);
 }
