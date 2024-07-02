@@ -6,8 +6,14 @@ function setupWebSocket(io) {
 
         // クライアントからカメラ位置情報を受信して更新する
         socket.on('enemyPosition', (data) => {
-            
+            console.log('Received enemyPosition from:', socket.id);
+            console.log('Camera position:', data.position);
+            console.log('Camera rotation:', data.rotation);
+
+            // データを保存
+            cameraPositions[socket.id] = data;
         });
+
 
         // クライアントが切断した場合、対応するカメラ位置情報を削除する
         socket.on('disconnect', () => {

@@ -552,21 +552,21 @@ export function animate() {
         lastShotTime = currentTime;
     }
 
-    let cameraPosition = {
-        x: camera.position.x,
-        y: camera.position.y,
-        z: camera.position.z
+    let enemyPosition = {
+        x: yawObject.position.x,
+        y: yawObject.position.y,
+        z: yawObject.position.z
     };
 
-    let cameraRotation = {
-        x: camera.rotation.x,
-        y: camera.rotation.y,
-        z: camera.rotation.z
+    let enemyRotation = {
+        x: yawObject.rotation.x,
+        y: yawObject.rotation.y,
+        z: yawObject.rotation.z
     };
 
     socket.emit('enemyPosition', {
-        position: cameraPosition,
-        rotation: cameraRotation
+        position: enemyPosition,
+        rotation: enemyRotation
     });
 
     if (gunModel) {
