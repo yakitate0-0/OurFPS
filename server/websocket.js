@@ -1,15 +1,18 @@
+let cameraPositions = {}; // クライアントごとのカメラ位置情報を保存するオブジェクト
+
 function setupWebSocket(io) {
     io.on('connection', (socket) => {
-        console.log('A user connected');
+        console.log('A user connected:', socket.id);
 
-        socket.on('updateCamera', (data) => {
-            console.log('Camera position:', data.position);
-            console.log('Camera rotation:', data.rotation);
-            // ここでデータを適切に処理
+        // クライアントからカメラ位置情報を受信して更新する
+        socket.on('enemyPosition', (data) => {
+            
         });
 
+        // クライアントが切断した場合、対応するカメラ位置情報を削除する
         socket.on('disconnect', () => {
-            console.log('User disconnected');
+            console.log('User disconnected:', socket.id);
+            delete cameraPositions[socket.id];
         });
     });
 }

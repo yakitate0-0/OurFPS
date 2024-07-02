@@ -15,11 +15,6 @@ const port = process.env.PORT || 3000;
 // 静的ファイルの提供
 app.use(express.static(path.join(__dirname, '../client')));
 
-// Socket.ioクライアントライブラリの提供
-app.get('/socket.io/socket.io.js', (req, res) => {
-    res.sendFile(path.join(__dirname, '../node_modules/socket.io/client-dist/socket.io.js'));
-});
-
 // サーバーのルートアクセスでindex.htmlを返す
 app.get('/', (req, res) => {
     res.sendFile(path.join(__dirname, '../client/index.html'));
