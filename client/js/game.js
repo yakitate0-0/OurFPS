@@ -579,5 +579,5 @@ export function animate() {
         gunModel.updateMatrixWorld();// 銃の位置を更新
     }
 
-    renderer.render(scene, camera);
+    renderer.render(scene, camera); // あいうえお
 }
