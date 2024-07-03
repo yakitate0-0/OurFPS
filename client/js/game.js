@@ -16,6 +16,7 @@ let isShooting = false;
 let ammo = 50;
 let isReloading = false;
 let lastShotTime = 0;
+let nowEnemyPositions = {};
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
 const reloadTime = 2000; // リロード時間（ミリ秒）
@@ -474,6 +475,11 @@ function reload() {
         }, reloadTime);
     }
 }
+
+socket.on('corectPositions', (data) => {
+    console.log('Received corectPositions:', data);
+    // ここで受信した位置データを処理する
+});
 
 
 // アニメーションループ
