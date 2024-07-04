@@ -35,7 +35,7 @@ const crouchHeight = 1.1; // しゃがみ時の高さ
 const lightSize = 6;
 const FLOOR_SIZE_x = 26;
 const FLOOR_SIZE_z = 20;
-const nomalLight = 1; //太陽の強さ
+const nomalLight = 0.1; //太陽の強さ
 const shoot_sound = new Audio("/assets/sounds/shoot.mp3");
 const reload_sound = new Audio("/assets/sounds/reload.mp3");
 const ready_sound = new Audio("/assets/sounds/ready.mp3");
@@ -261,8 +261,6 @@ export function init() {
     
             // 敵のスポットライトを初期化
             enemySpotLight = new THREE.SpotLight(0xffffff, 3.5, 100, Math.PI / lightSize, 0.1, 1);
-            enemySpotLight.position.set(0, 0, 0);
-            enemySpotLight.target.position.set(0, 0, -1);
             enemySpotLight.visible = false; // 初期状態はオフ
             scene.add(enemySpotLight);
             scene.add(enemySpotLight.target);
@@ -498,31 +496,20 @@ socket.on('corectPositions', (data) => {
     // 敵の位置情報をBearモデルに反映
     const enemyId = Object.keys(data.positions).find(id => id !== socket.id); // 自分のID以外のIDを取得
     if (bearModel && enemyId) {
-        bearModel.position.set(
-            data.positions[enemyId].x,
-            data.positions[enemyId].y,
-            data.positions[enemyId].z
+        const enemyPosition = data.positions[enemyId];
+        const enemyRotation = data.rotations[enemyId];
+
+        bearModel.position.set(enemyPosition.x, enemyPosition.y, enemyPosition.z);
+        bearModel.rotation.set(enemyRotation.x, enemyRotation.y + Math.PI, enemyRotation.z);
+
+        // 敵のスポットライトの位置と方向をBearモデルと同期
+        enemySpotLight.position.copy(bearModel.position);
+        enemySpotLight.target.position.set(
+            enemyPosition.x + Math.sin(enemyRotation.y + Math.PI),
+            enemyPosition.y,
+            enemyPosition.z + Math.cos(enemyRotation.y + Math.PI)
         );
-
-        // 回転の値を反転させる
-        bearModel.rotation.set(
-            data.rotations[enemyId].x,
-            data.rotations[enemyId].y + Math.PI,
-            data.rotations[enemyId].z
-        );
-
-        // 敵のスポットライトの位置と方向を更新
-        enemySpotLight.position.set(
-            data.positions[enemyId].x,
-            data.positions[enemyId].y,
-            data.positions[enemyId].z
-        );
-
-        const targetX = data.positions[enemyId].x + Math.sin(data.rotations[enemyId].y + Math.PI);
-        const targetZ = data.positions[enemyId].z + Math.cos(data.rotations[enemyId].y + Math.PI);
-
-        enemySpotLight.target.position.set(targetX, data.positions[enemyId].y, targetZ);
-        enemySpotLight.target.updateMatrixWorld(); // ターゲット位置の更新
+        enemySpotLight.target.updateMatrixWorld();
 
         // サーバーから受信したスポットライトの状態を反映
         enemySpotLight.visible = data.spotLightStates[enemyId];
