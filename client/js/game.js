@@ -513,11 +513,13 @@ socket.on('corectPositions', (data) => {
             data.positions[enemyId].y,
             data.positions[enemyId].z
         );
-        enemySpotLight.target.position.set(
-            data.positions[enemyId].x + Math.sin(data.rotations[enemyId].y),
-            data.positions[enemyId].y,
-            data.positions[enemyId].z + Math.cos(data.rotations[enemyId].y)
-        );
+
+        const targetX = data.positions[enemyId].x + Math.sin(data.rotations[enemyId].y + Math.PI);
+        const targetZ = data.positions[enemyId].z + Math.cos(data.rotations[enemyId].y + Math.PI);
+
+        enemySpotLight.target.position.set(targetX, data.positions[enemyId].y, targetZ);
+        enemySpotLight.target.updateMatrixWorld(); // ターゲット位置の更新
+
         enemySpotLight.visible = data.spotLightVisible; // サーバーから受信した状態を反映
     }
 });
