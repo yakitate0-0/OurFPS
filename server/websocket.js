@@ -25,6 +25,10 @@ function setupWebSocket(io) {
             });
         });
 
+        socket.on('gunsound',() => {
+            io.emit('soundofgun');
+        });
+
         // ダメージを受けた場合の処理
         socket.on('hit', (data) => {
             const enemyId = data.enemyId;

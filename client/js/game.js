@@ -41,6 +41,7 @@ const FLOOR_SIZE_x = 26;
 const FLOOR_SIZE_z = 20;
 const nomalLight = 1; //太陽の強さ
 const shoot_sound = new Audio("/assets/sounds/shoot.mp3");
+const shoot1_sound = new Audio("/assets/sounds/shoot.mp3");
 const reload_sound = new Audio("/assets/sounds/reload.mp3");
 const ready_sound = new Audio("/assets/sounds/ready.mp3");
 const set_sound = new Audio("/assets/sounds/set.mp3");
@@ -448,6 +449,7 @@ export function onKeyUp(event) {
 function onMouseDown(event) {
     if (event.button === 0) { // 左クリック
         isShooting = true;
+        socket.emit('gunsound');
     } else if (event.button === 2) { // 右クリック
         spotLight.visible = !spotLight.visible;
         // スポットライトの状態をサーバーに送信
@@ -498,6 +500,11 @@ function reload() {
         }, reloadTime);
     }
 }
+
+socket.on('soundofgun',() => {
+    shoot1_sound.currentTime = 0;
+    shoot1_sound.play();
+});
 
 socket.on('corectPositions', (data) => {
     nowEnemyPositions = data.positions; // 追加：nowEnemyPositionsを更新
