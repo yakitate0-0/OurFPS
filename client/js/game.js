@@ -741,3 +741,9 @@ export function animate() {
 
     renderer.render(scene, camera);
 }
+
+socket.on('gameOver', (data) => {
+    const message = data.winnerId === socket.id ? 'You Win!' : 'You Lose!';
+    alert(message);
+    // 必要に応じてリセット処理や画面遷移などを行う
+});

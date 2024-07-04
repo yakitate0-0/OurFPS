@@ -45,6 +45,14 @@ function setupWebSocket(io) {
                     playerId: enemyId,
                     hp: playerHps[enemyId]
                 });
+
+                // ゲームオーバーの判定
+                if (playerHps[enemyId] <= 0) {
+                    const winnerId = Object.keys(playerHps).find(id => id !== enemyId);
+                    io.emit('gameOver', {
+                        winnerId: winnerId
+                    });
+                }
             }
         });
 
