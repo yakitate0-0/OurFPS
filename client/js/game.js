@@ -483,16 +483,18 @@ socket.on('corectPositions', (data) => {
     console.log('Received corectPositions:', data);
 
     // 敵の位置情報をBearモデルに反映
-    const enemyId = Object.keys(data.positions)[0]; // 1対1のマッチングなので最初のIDを使う
+    const enemyId = Object.keys(data.positions).find(id => id !== socket.id); // 自分のID以外のIDを取得
     if (bearModel && enemyId) {
         bearModel.position.set(
             data.positions[enemyId].x,
             data.positions[enemyId].y,
             data.positions[enemyId].z
         );
+
+        // 回転の値を反転させる
         bearModel.rotation.set(
             data.rotations[enemyId].x,
-            data.rotations[enemyId].y,
+            data.rotations[enemyId].y + Math.PI,
             data.rotations[enemyId].z
         );
     }
@@ -603,5 +605,4 @@ export function animate() {
 
     renderer.render(scene, camera);
 }
-
 

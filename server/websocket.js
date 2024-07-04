@@ -12,8 +12,8 @@ function setupWebSocket(io) {
             console.log('Camera rotation:', data.rotation);
 
             // データを保存
-            positions = data.position;
-            rotations = data.rotation;
+            positions[socket.id] = data.position;
+            rotations[socket.id] = data.rotation;
 
             // 全てのクライアントにブロードキャスト
             io.emit('corectPositions', {
