@@ -160,7 +160,7 @@ export function init() {
     );
 
     loader.load(
-        'assets/models/warehouse.glb',
+        'assets/models/warahouse.glb',
         function (gltf) {
             gltf.scene.position.set(8, 0, 1.5); // 倉庫の位置を設定
             scene.add(gltf.scene);
@@ -172,8 +172,8 @@ export function init() {
                     wallBoxes.push(box); // 床のバウンディングボックスを追加
 
                     // バウンディングボックスの可視化用
-                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                    // scene.add(boxHelper);
+                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    scene.add(boxHelper);
 
                     // マテリアルの設定を確認
                     child.material = new THREE.MeshStandardMaterial({
@@ -448,7 +448,6 @@ export function onKeyUp(event) {
 function onMouseDown(event) {
     if (event.button === 0) { // 左クリック
         isShooting = true;
-        shoot(); // 即座に1発目を発射
     } else if (event.button === 2) { // 右クリック
         spotLight.visible = !spotLight.visible;
         // スポットライトの状態をサーバーに送信
@@ -531,6 +530,7 @@ function createBullet() {
     const bulletGeometry = new THREE.SphereGeometry(0.1, 8, 8);
     const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
+    bullet.scale.set(0.1,0.1,0.1);
 
     // 弾丸の初期位置をカメラに設定
     bullet.position.copy(camera.position);
@@ -745,5 +745,4 @@ export function animate() {
 socket.on('gameOver', (data) => {
     const message = data.winnerId === socket.id ? 'You Win!' : 'You Lose!';
     alert(message);
-    // 必要に応じてリセット処理や画面遷移などを行う
 });
