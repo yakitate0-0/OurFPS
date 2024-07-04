@@ -8,21 +8,16 @@ function setupWebSocket(io) {
 
         // クライアントからカメラ位置情報を受信して更新する
         socket.on('enemyPosition', (data) => {
-            console.log('Received enemyPosition from:', socket.id);
-            console.log('Camera position:', data.position);
-            console.log('Camera rotation:', data.rotation);
-            console.log('Spotlight visible:', data.spotLightVisible);
-
             // データを保存
             positions[socket.id] = data.position;
             rotations[socket.id] = data.rotation;
-            spotLightStates[socket.id] = data.spotLightVisible;
+            spotLightStates[socket.id] = data.spotLightVisible; // スポットライトの状態を保存
 
             // 全てのクライアントにブロードキャスト
             io.emit('corectPositions', {
-                positions,
-                rotations,
-                spotLightStates
+                positions: positions,
+                rotations: rotations,
+                spotLightStates: spotLightStates // スポットライトの状態を送信
             });
         });
 
@@ -31,13 +26,13 @@ function setupWebSocket(io) {
             console.log('User disconnected:', socket.id);
             delete positions[socket.id];
             delete rotations[socket.id];
-            delete spotLightStates[socket.id];
+            delete spotLightStates[socket.id]; // スポットライトの状態を削除
 
             // クライアント切断後のデータをブロードキャスト
             io.emit('corectPositions', {
-                positions,
-                rotations,
-                spotLightStates
+                positions: positions,
+                rotations: rotations,
+                spotLightStates: spotLightStates // スポットライトの状態を送信
             });
         });
     });

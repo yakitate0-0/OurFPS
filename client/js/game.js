@@ -500,6 +500,7 @@ function reload() {
 }
 
 socket.on('corectPositions', (data) => {
+    nowEnemyPositions = data.positions; // 追加：nowEnemyPositionsを更新
 
     // 敵の位置情報をBearモデルに反映
     const enemyId = Object.keys(data.positions).find(id => id !== socket.id); // 自分のID以外のIDを取得
@@ -587,7 +588,6 @@ function checkCollisions() {
         if (!bulletRemoved && bearModel) {
             const bearBox = new THREE.Box3().setFromObject(bearModel);
             if (bulletBox.intersectsBox(bearBox)) {
-                console.log('Hit bear!');
                 // 弾丸を削除
                 bullet.parent.remove(bullet); // カメラ以外に追加された場合に対応
                 bullets.splice(bulletIndex, 1);
@@ -596,10 +596,13 @@ function checkCollisions() {
                 // 敵にダメージを通告
                 const enemyId = Object.keys(nowEnemyPositions).find(id => id !== socket.id);
                 if (enemyId) {
+                    console.log('Hit bear! Sending hit to enemyId:', enemyId); // デバッグログを追加
                     socket.emit('hit', {
                         enemyId: enemyId,
                         damage: 10 // ダメージ量を指定
                     });
+                } else {
+                    console.log("Do not have enemyID");
                 }
             }
         }
