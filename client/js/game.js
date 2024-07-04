@@ -565,24 +565,25 @@ function moveBullets(delta) {
 function checkCollisions() {
     bullets.forEach((bullet, bulletIndex) => {
         const bulletBox = new THREE.Box3().setFromObject(bullet);
+        let bulletRemoved = false;
 
         // 各衝突対象オブジェクトのバウンディングボックスに対して判定を行う
-        collisionBoxes.forEach((objectBox) => {
-            if (bulletBox.intersectsBox(objectBox)) {
+        collisionBoxes.forEach((objectBox, objectIndex) => {
+            if (bulletBox.intersectsBox(objectBox) && !bulletRemoved) {
                 console.log('Bullet hit an object!');
                 // 弾丸を削除
-                camera.remove(bullet);
+                bullet.parent.remove(bullet); // カメラ以外に追加された場合に対応
                 bullets.splice(bulletIndex, 1);
-                return; // すでに衝突した弾丸についてはこれ以上処理しない
+                bulletRemoved = true; // すでに衝突した弾丸についてはこれ以上処理しない
             }
         });
 
         // Bearモデルとの衝突判定
         const bearBox = new THREE.Box3().setFromObject(bearModel);
-        if (bulletBox.intersectsBox(bearBox)) {
+        if (bulletBox.intersectsBox(bearBox) && !bulletRemoved) {
             console.log('Hit bear!');
             // 弾丸を削除
-            camera.remove(bullet);
+            bullet.parent.remove(bullet); // カメラ以外に追加された場合に対応
             bullets.splice(bulletIndex, 1);
 
             // 敵にダメージを通告
@@ -590,9 +591,11 @@ function checkCollisions() {
                 enemyId: enemyId,
                 damage: 10 // ダメージ量を指定
             });
+            bulletRemoved = true; // すでに衝突した弾丸についてはこれ以上処理しない
         }
     });
 }
+
 
 
 
