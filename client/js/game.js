@@ -21,6 +21,7 @@ let bearModel;
 let enemySpotLight; // 敵のスポットライト
 let bullets = []; // 弾丸を格納する配列
 let collisionBoxes = []; // 衝突判定の対象となるオブジェクトのバウンディングボックス配列
+let playerHp = 100; // 初期HP
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
@@ -103,213 +104,211 @@ export function init() {
         }
     }
 
-loader.load(
-    'assets/models/wall.glb',
-    function (gltf) {
-        const wall1 = gltf.scene.clone();
-        wall1.position.set(4, 1, 6); // 壁1の位置を設定
-        scene.add(wall1);
-        wall1.updateMatrixWorld(); // 位置を更新
-        wall1.traverse(child => {
-            if (child.isMesh) {
-                const box = new THREE.Box3().setFromObject(child);
-                collisionBoxes.push(box); // 配列に追加
-                wallBoxes.push(box); // 床のバウンディングボックスを追加
+    loader.load(
+        'assets/models/wall.glb',
+        function (gltf) {
+            const wall1 = gltf.scene.clone();
+            wall1.position.set(4, 1, 6); // 壁1の位置を設定
+            scene.add(wall1);
+            wall1.updateMatrixWorld(); // 位置を更新
+            wall1.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    collisionBoxes.push(box); // 配列に追加
+                    wallBoxes.push(box); // 床のバウンディングボックスを追加
 
-                // バウンディングボックスの可視化用
-                // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                // scene.add(boxHelper);
+                    // バウンディングボックスの可視化用
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
-                // マテリアルの設定を確認
-                child.material = new THREE.MeshStandardMaterial({
-                    map: child.material.map,
-                    color: child.material.color,
-                    metalness: 0.5,
-                    roughness: 0.5
-                });
-            }
-        });
+                    // マテリアルの設定を確認
+                    child.material = new THREE.MeshStandardMaterial({
+                        map: child.material.map,
+                        color: child.material.color,
+                        metalness: 0.5,
+                        roughness: 0.5
+                    });
+                }
+            });
 
-        const wall2 = gltf.scene.clone();
-        wall2.position.set(-4, 1, -6); // 壁2の位置を設定
-        scene.add(wall2);
-        wall2.updateMatrixWorld(); // 位置を更新
-        wall2.traverse(child => {
-            if (child.isMesh) {
-                const box = new THREE.Box3().setFromObject(child);
-                collisionBoxes.push(box); // 配列に追加
-                wallBoxes.push(box); // 床のバウンディングボックスを追加
+            const wall2 = gltf.scene.clone();
+            wall2.position.set(-4, 1, -6); // 壁2の位置を設定
+            scene.add(wall2);
+            wall2.updateMatrixWorld(); // 位置を更新
+            wall2.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    collisionBoxes.push(box); // 配列に追加
+                    wallBoxes.push(box); // 床のバウンディングボックスを追加
 
-                // バウンディングボックスの可視化用
-                // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                // scene.add(boxHelper);
+                    // バウンディングボックスの可視化用
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
-                // マテリアルの設定を確認
-                child.material = new THREE.MeshStandardMaterial({
-                    map: child.material.map,
-                    color: child.material.color,
-                    metalness: 0.5,
-                    roughness: 0.5
-                });
-            }
-        });
-        modelLoaded();
-    },
-    onProgress
-);
+                    // マテリアルの設定を確認
+                    child.material = new THREE.MeshStandardMaterial({
+                        map: child.material.map,
+                        color: child.material.color,
+                        metalness: 0.5,
+                        roughness: 0.5
+                    });
+                }
+            });
+            modelLoaded();
+        },
+        onProgress
+    );
 
-loader.load(
-    'assets/models/warehouse.glb',
-    function (gltf) {
-        gltf.scene.position.set(8, 0, 1.5); // 倉庫の位置を設定
-        scene.add(gltf.scene);
-        gltf.scene.updateMatrixWorld(); // 位置を更新
-        gltf.scene.traverse(child => {
-            if (child.isMesh) {
-                const box = new THREE.Box3().setFromObject(child);
-                collisionBoxes.push(box); // 配列に追加
-                wallBoxes.push(box); // 床のバウンディングボックスを追加
+    loader.load(
+        'assets/models/warehouse.glb',
+        function (gltf) {
+            gltf.scene.position.set(8, 0, 1.5); // 倉庫の位置を設定
+            scene.add(gltf.scene);
+            gltf.scene.updateMatrixWorld(); // 位置を更新
+            gltf.scene.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    collisionBoxes.push(box); // 配列に追加
+                    wallBoxes.push(box); // 床のバウンディングボックスを追加
 
-                // バウンディングボックスの可視化用
-                // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                // scene.add(boxHelper);
+                    // バウンディングボックスの可視化用
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
-                // マテリアルの設定を確認
-                child.material = new THREE.MeshStandardMaterial({
-                    map: child.material.map,
-                    color: child.material.color,
-                    metalness: 0.5,
-                    roughness: 0.5
-                });
-            }
-        });
-        modelLoaded();
-    },
-    onProgress
-);
+                    // マテリアルの設定を確認
+                    child.material = new THREE.MeshStandardMaterial({
+                        map: child.material.map,
+                        color: child.material.color,
+                        metalness: 0.5,
+                        roughness: 0.5
+                    });
+                }
+            });
+            modelLoaded();
+        },
+        onProgress
+    );
 
-loader.load(
-    'assets/models/house2.glb',
-    function (gltf) {
-        gltf.scene.position.set(5, 0.01, -4); // house2の位置を設定
-        scene.add(gltf.scene);
-        gltf.scene.updateMatrixWorld(); // 位置を更新
-        gltf.scene.traverse(child => {
-            if (child.isMesh) {
-                const box = new THREE.Box3().setFromObject(child);
-                collisionBoxes.push(box); // 配列に追加
-                wallBoxes.push(box); // 床のバウンディングボックスを追加
+    loader.load(
+        'assets/models/house2.glb',
+        function (gltf) {
+            gltf.scene.position.set(5, 0.01, -4); // house2の位置を設定
+            scene.add(gltf.scene);
+            gltf.scene.updateMatrixWorld(); // 位置を更新
+            gltf.scene.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    collisionBoxes.push(box); // 配列に追加
+                    wallBoxes.push(box); // 床のバウンディングボックスを追加
 
-                // バウンディングボックスの可視化用
-                // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                // scene.add(boxHelper);
+                    // バウンディングボックスの可視化用
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
-                // マテリアルの設定を確認
-                child.material = new THREE.MeshStandardMaterial({
-                    map: child.material.map,
-                    color: child.material.color,
-                    metalness: 0.5,
-                    roughness: 0.5
-                });
-            }
-        });
-        modelLoaded();
-    },
-    onProgress
-);
+                    // マテリアルの設定を確認
+                    child.material = new THREE.MeshStandardMaterial({
+                        map: child.material.map,
+                        color: child.material.color,
+                        metalness: 0.5,
+                        roughness: 0.5
+                    });
+                }
+            });
+            modelLoaded();
+        },
+        onProgress
+    );
 
-loader.load(
-    'assets/models/house1.glb',
-    function (gltf) {
-        gltf.scene.position.set(-4, 0.01, 2); // house1の位置を設定
-        scene.add(gltf.scene);
-        gltf.scene.updateMatrixWorld(); // 位置を更新
-        gltf.scene.traverse(child => {
-            if (child.isMesh) {
-                const box = new THREE.Box3().setFromObject(child);
-                collisionBoxes.push(box); // 配列に追加
-                wallBoxes.push(box); // 床のバウンディングボックスを追加
+    loader.load(
+        'assets/models/house1.glb',
+        function (gltf) {
+            gltf.scene.position.set(-4, 0.01, 2); // house1の位置を設定
+            scene.add(gltf.scene);
+            gltf.scene.updateMatrixWorld(); // 位置を更新
+            gltf.scene.traverse(child => {
+                if (child.isMesh) {
+                    const box = new THREE.Box3().setFromObject(child);
+                    collisionBoxes.push(box); // 配列に追加
+                    wallBoxes.push(box); // 床のバウンディングボックスを追加
 
-                // バウンディングボックスの可視化用
-                // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                // scene.add(boxHelper);
+                    // バウンディングボックスの可視化用
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
-                // マテリアルの設定を確認
-                child.material = new THREE.MeshStandardMaterial({
-                    map: child.material.map,
-                    color: child.material.color,
-                    metalness: 0.5,
-                    roughness: 0.5
-                });
-            }
-        });
-        modelLoaded();
-    },
-    onProgress
-);
+                    // マテリアルの設定を確認
+                    child.material = new THREE.MeshStandardMaterial({
+                        map: child.material.map,
+                        color: child.material.color,
+                        metalness: 0.5,
+                        roughness: 0.5
+                    });
+                }
+            });
+            modelLoaded();
+        },
+        onProgress
+    );
 
-loader.load(
-    'assets/models/floor.glb',
-    function (gltf) {
-        gltf.scene.position.set(0, 0, 0); // floorの位置を設定
-        scene.add(gltf.scene);
-        // ロード完了後にロード画面を非表示にする
-        modelLoaded();
-    },
-    onProgress
-);
+    loader.load(
+        'assets/models/floor.glb',
+        function (gltf) {
+            gltf.scene.position.set(0, 0, 0); // floorの位置を設定
+            scene.add(gltf.scene);
+            // ロード完了後にロード画面を非表示にする
+            modelLoaded();
+        },
+        onProgress
+    );
 
-loader.load(
-    'assets/models/bear_nomal.glb',
-    function (gltf) {
-        bearModel = gltf.scene;
-        bearModel.position.set(3, 1.4, 2);
-        bearModel.scale.set(0.5, 0.5, 0.5);
-        scene.add(bearModel);
+    loader.load(
+        'assets/models/bear_nomal.glb',
+        function (gltf) {
+            bearModel = gltf.scene;
+            bearModel.position.set(3, 1.4, 2);
+            bearModel.scale.set(0.5, 0.5, 0.5);
+            scene.add(bearModel);
 
-        // 敵のスポットライトを初期化
-        enemySpotLight = new THREE.SpotLight(0xffffff, 3.5, 100, Math.PI / lightSize, 0.1, 1);
-        enemySpotLight.visible = false; // 初期状態はオフ
-        scene.add(enemySpotLight);
-        scene.add(enemySpotLight.target);
+            // 敵のスポットライトを初期化
+            enemySpotLight = new THREE.SpotLight(0xffffff, 3.5, 100, Math.PI / lightSize, 0.1, 1);
+            enemySpotLight.visible = false; // 初期状態はオフ
+            scene.add(enemySpotLight);
+            scene.add(enemySpotLight.target);
 
-        // ロード完了後にロード画面を非表示にする
-        modelLoaded();
-    },
-    onProgress
-);
+            // ロード完了後にロード画面を非表示にする
+            modelLoaded();
+        },
+        onProgress
+    );
 
-loader.load(
-    'assets/models/gun.glb',
-    function (gltf) {
-        gunModel = gltf.scene;
-        gunModel.scale.set(0.5, 0.5, 0.5);
+    loader.load(
+        'assets/models/gun.glb',
+        function (gltf) {
+            gunModel = gltf.scene;
+            gunModel.scale.set(0.5, 0.5, 0.5);
 
-        gunModel.traverse((child) => {
-            if (child.isMesh) {
-                // 現在のマテリアルのテクスチャを取得
-                const texture = child.material.map;
+            gunModel.traverse((child) => {
+                if (child.isMesh) {
+                    // 現在のマテリアルのテクスチャを取得
+                    const texture = child.material.map;
 
-                // 光の影響を受けないマテリアルに変更
-                child.material = new THREE.MeshStandardMaterial({
-                    map: texture,
-                    color: 0x005243, // 黒色
-                    metalness: 1.0, // 金属っぽさ
-                    roughness: 0.2 // 表面の粗さを調整
-                });
-            }
-        });
+                    // 光の影響を受けないマテリアルに変更
+                    child.material = new THREE.MeshStandardMaterial({
+                        map: texture,
+                        color: 0x005243, // 黒色
+                        metalness: 1.0, // 金属っぽさ
+                        roughness: 0.2 // 表面の粗さを調整
+                    });
+                }
+            });
 
-        // カメラに追加してプレイヤー視点にする
-        camera.add(gunModel);
-        gunModel.position.set(1, -0.5, -1); // カメラからの相対位置を設定
-        gunModel.rotation.set(0, Math.PI * 3 / 2, 0); // 銃の向きを調整（必要に応じて調整）
-        modelLoaded();
-    },
-    onProgress
-);
-
-
+            // カメラに追加してプレイヤー視点にする
+            camera.add(gunModel);
+            gunModel.position.set(1, -0.5, -1); // カメラからの相対位置を設定
+            gunModel.rotation.set(0, Math.PI * 3 / 2, 0); // 銃の向きを調整（必要に応じて調整）
+            modelLoaded();
+        },
+        onProgress
+    );
 
     const SIZE = 3000;
     const LENGTH = 1000;
@@ -347,6 +346,8 @@ loader.load(
     });
 
     animate(); // アニメーションループの開始
+    updateHpBar();//HPの初期化
+
 }
 
 // ロード画面を表示する関数
@@ -466,7 +467,7 @@ function shoot() {
     if (ammo > 0 && !isReloading) {
         shoot_sound.currentTime = 0;
         shoot_sound.play();
-         // 実際の発砲処理をここに追加
+        // 実際の発砲処理をここに追加
         createBullet();
         ammo--;
         applyRecoil();
@@ -533,7 +534,7 @@ function createBullet() {
 
     // 弾丸の初期位置をカメラに設定
     bullet.position.copy(camera.position);
-    
+
     // カメラの方向を取得
     const bulletDirection = new THREE.Vector3();
     camera.getWorldDirection(bulletDirection);
@@ -609,6 +610,30 @@ function checkCollisions() {
     });
 }
 
+function updateHpBar() {
+    const hpBar = document.getElementById('hp-bar');
+    if (hpBar) {
+        hpBar.style.width = playerHp + '%';
+    } else {
+        console.error("HP bar element not found");
+    }
+}
+
+socket.on('damage', (data) => {
+    if (data.enemyId === socket.id) { // playerIdからenemyIdに変更
+        playerHp -= data.damage;
+        if (playerHp < 0) playerHp = 0;
+        updateHpBar();
+    }
+});
+
+
+socket.on('updateHP', (data) => {
+    const playerId = data.playerId;
+    const hp = data.hp;
+    console.log(`Player ${playerId} HP updated: ${hp}`);
+    // 他のプレイヤーのHPが更新された場合の処理を追加することもできます
+});
 
 // プレイヤの位置を送信する
 function updatePlayerPosition() {
