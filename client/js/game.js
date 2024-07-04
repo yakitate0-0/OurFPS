@@ -114,6 +114,7 @@ loader.load(
             if (child.isMesh) {
                 const box = new THREE.Box3().setFromObject(child);
                 collisionBoxes.push(box); // 配列に追加
+                wallBoxes.push(box); // 床のバウンディングボックスを追加
 
                 // バウンディングボックスの可視化用
                 // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
@@ -137,6 +138,7 @@ loader.load(
             if (child.isMesh) {
                 const box = new THREE.Box3().setFromObject(child);
                 collisionBoxes.push(box); // 配列に追加
+                wallBoxes.push(box); // 床のバウンディングボックスを追加
 
                 // バウンディングボックスの可視化用
                 // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
@@ -166,6 +168,7 @@ loader.load(
             if (child.isMesh) {
                 const box = new THREE.Box3().setFromObject(child);
                 collisionBoxes.push(box); // 配列に追加
+                wallBoxes.push(box); // 床のバウンディングボックスを追加
 
                 // バウンディングボックスの可視化用
                 // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
@@ -195,6 +198,7 @@ loader.load(
             if (child.isMesh) {
                 const box = new THREE.Box3().setFromObject(child);
                 collisionBoxes.push(box); // 配列に追加
+                wallBoxes.push(box); // 床のバウンディングボックスを追加
 
                 // バウンディングボックスの可視化用
                 // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
@@ -224,6 +228,7 @@ loader.load(
             if (child.isMesh) {
                 const box = new THREE.Box3().setFromObject(child);
                 collisionBoxes.push(box); // 配列に追加
+                wallBoxes.push(box); // 床のバウンディングボックスを追加
 
                 // バウンディングボックスの可視化用
                 // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
@@ -568,7 +573,7 @@ function checkCollisions() {
         let bulletRemoved = false;
 
         // 各衝突対象オブジェクトのバウンディングボックスに対して判定を行う
-        collisionBoxes.forEach((objectBox, objectIndex) => {
+        collisionBoxes.forEach((objectBox) => {
             if (bulletBox.intersectsBox(objectBox) && !bulletRemoved) {
                 console.log('Bullet hit an object!');
                 // 弾丸を削除
@@ -579,27 +584,27 @@ function checkCollisions() {
         });
 
         // Bearモデルとの衝突判定
-        const bearBox = new THREE.Box3().setFromObject(bearModel);
-        if (bulletBox.intersectsBox(bearBox) && !bulletRemoved) {
-            console.log('Hit bear!');
-            // 弾丸を削除
-            bullet.parent.remove(bullet); // カメラ以外に追加された場合に対応
-            bullets.splice(bulletIndex, 1);
+        if (!bulletRemoved && bearModel) {
+            const bearBox = new THREE.Box3().setFromObject(bearModel);
+            if (bulletBox.intersectsBox(bearBox)) {
+                console.log('Hit bear!');
+                // 弾丸を削除
+                bullet.parent.remove(bullet); // カメラ以外に追加された場合に対応
+                bullets.splice(bulletIndex, 1);
+                bulletRemoved = true; // すでに衝突した弾丸についてはこれ以上処理しない
 
-            // 敵にダメージを通告
-            socket.emit('hit', {
-                enemyId: enemyId,
-                damage: 10 // ダメージ量を指定
-            });
-            bulletRemoved = true; // すでに衝突した弾丸についてはこれ以上処理しない
+                // 敵にダメージを通告
+                const enemyId = Object.keys(nowEnemyPositions).find(id => id !== socket.id);
+                if (enemyId) {
+                    socket.emit('hit', {
+                        enemyId: enemyId,
+                        damage: 10 // ダメージ量を指定
+                    });
+                }
+            }
         }
     });
 }
-
-
-
-
-
 
 
 // プレイヤの位置を送信する
@@ -658,15 +663,15 @@ export function animate() {
         velocity.z = 0;
     }
 
-    // 衝突検出
+    // プレイヤーのバウンディングボックスを作成
     const playerBox = new THREE.Box3().setFromCenterAndSize(
         new THREE.Vector3(yawObject.position.x, yawObject.position.y - normalHeight / 2, yawObject.position.z),
         new THREE.Vector3(1, normalHeight, 1)
     );
 
+    // 衝突判定
     let collisionDetected = false;
-
-    for (const box of wallBoxes) {
+    for (const box of collisionBoxes) {
         if (playerBox.intersectsBox(box)) {
             collisionDetected = true;
             break;
