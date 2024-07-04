@@ -19,6 +19,9 @@ let lastShotTime = 0;
 let nowEnemyPositions = {};
 let bearModel;
 let enemySpotLight; // 敵のスポットライト
+let bullets = []; // 弾丸を格納する配列
+let collisionBoxes = []; // 衝突判定の対象となるオブジェクトのバウンディングボックス配列
+const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
 const reloadTime = 2000; // リロード時間（ミリ秒）
@@ -35,7 +38,7 @@ const crouchHeight = 1.1; // しゃがみ時の高さ
 const lightSize = 6;
 const FLOOR_SIZE_x = 26;
 const FLOOR_SIZE_z = 20;
-const nomalLight = 0.1; //太陽の強さ
+const nomalLight = 1; //太陽の強さ
 const shoot_sound = new Audio("/assets/sounds/shoot.mp3");
 const reload_sound = new Audio("/assets/sounds/reload.mp3");
 const ready_sound = new Audio("/assets/sounds/ready.mp3");
@@ -458,7 +461,8 @@ function shoot() {
     if (ammo > 0 && !isReloading) {
         shoot_sound.currentTime = 0;
         shoot_sound.play();
-        console.log("Bang!"); // 実際の発砲処理をここに追加
+         // 実際の発砲処理をここに追加
+        createBullet();
         ammo--;
         applyRecoil();
         if (ammo === 0) {
@@ -491,7 +495,6 @@ function reload() {
 }
 
 socket.on('corectPositions', (data) => {
-    console.log('Received corectPositions:', data);
 
     // 敵の位置情報をBearモデルに反映
     const enemyId = Object.keys(data.positions).find(id => id !== socket.id); // 自分のID以外のIDを取得
@@ -516,6 +519,68 @@ socket.on('corectPositions', (data) => {
     }
 });
 
+
+function createBullet() {
+    const bulletGeometry = new THREE.SphereGeometry(0.1, 8, 8);
+    const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
+    const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
+
+    // 弾丸の初期位置をカメラに設定
+    bullet.position.copy(camera.position);
+    
+    // カメラの方向を取得
+    const bulletDirection = new THREE.Vector3();
+    camera.getWorldDirection(bulletDirection);
+    bullet.userData.velocity = bulletDirection.clone().multiplyScalar(bulletSpeed);
+
+    // カメラに弾丸を追加
+    camera.add(bullet);
+    bullets.push(bullet);
+}
+
+
+
+function moveBullets(delta) {
+    bullets.forEach((bullet, index) => {
+        // カメラの位置に基づいて弾丸を移動
+        const worldPosition = new THREE.Vector3();
+        bullet.getWorldPosition(worldPosition);
+        const direction = new THREE.Vector3();
+        direction.copy(bullet.userData.velocity).multiplyScalar(delta);
+
+        worldPosition.add(direction);
+
+        bullet.position.copy(camera.worldToLocal(worldPosition));
+
+        // 弾丸が一定距離を超えたら削除
+        if (worldPosition.length() > 500) {
+            camera.remove(bullet);
+            bullets.splice(index, 1);
+        }
+    });
+}
+
+
+
+function checkCollisions() {
+    bullets.forEach((bullet, bulletIndex) => {
+        const bulletBox = new THREE.Box3().setFromObject(bullet);
+        const bearBox = new THREE.Box3().setFromObject(bearModel);
+
+        if (bulletBox.intersectsBox(bearBox)) {
+            console.log('Hit!');
+            // 弾丸を削除
+            camera.remove(bullet);
+            bullets.splice(bulletIndex, 1);
+
+            // 敵にダメージを通告
+            socket.emit('hit', {
+                enemyId: enemyId,
+                damage: 10 // ダメージ量を指定
+            });
+        }
+    });
+}
 
 
 
@@ -542,8 +607,6 @@ function updatePlayerPosition() {
 }
 
 
-
-// アニメーションループの中で位置情報を送信する
 export function animate() {
     requestAnimationFrame(animate);
 
@@ -618,6 +681,9 @@ export function animate() {
     }
 
     updatePlayerPosition(); // プレイヤーの位置情報を送信
+
+    moveBullets(delta); // 弾丸を移動
+    checkCollisions(); // 当たり判定
 
     if (gunModel) {
         gunModel.updateMatrixWorld(); // 銃の位置を更新
