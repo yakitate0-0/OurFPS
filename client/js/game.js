@@ -18,6 +18,7 @@ let isReloading = false;
 let lastShotTime = 0;
 let nowEnemyPositions = {};
 let bearModel;
+let enemySpotLight; // 敵のスポットライト
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
 const reloadTime = 2000; // リロード時間（ミリ秒）
@@ -257,6 +258,14 @@ export function init() {
             bearModel.position.set(3, 1.4, 2);
             bearModel.scale.set(0.5, 0.5, 0.5);
             scene.add(bearModel);
+
+            enemySpotLight = new THREE.SpotLight(0xffffff, 3.5, 100, Math.PI / lightSize, 0.1, 1);
+            enemySpotLight.position.set(0, 0, 0);
+            enemySpotLight.target.position.set(0, 0, -1);
+            enemySpotLight.visible = false; // 初期状態はオフ
+            scene.add(enemySpotLight);
+            scene.add(enemySpotLight.target);
+
             // ロード完了後にロード画面を非表示にする
             modelLoaded();
         },
@@ -497,6 +506,19 @@ socket.on('corectPositions', (data) => {
             data.rotations[enemyId].y + Math.PI,
             data.rotations[enemyId].z
         );
+
+        // 敵のスポットライトの位置と方向を更新
+        enemySpotLight.position.set(
+            data.positions[enemyId].x,
+            data.positions[enemyId].y,
+            data.positions[enemyId].z
+        );
+        enemySpotLight.target.position.set(
+            data.positions[enemyId].x + Math.sin(data.rotations[enemyId].y),
+            data.positions[enemyId].y,
+            data.positions[enemyId].z + Math.cos(data.rotations[enemyId].y)
+        );
+        enemySpotLight.visible = data.spotLightVisible; // サーバーから受信した状態を反映
     }
 });
 
@@ -518,9 +540,11 @@ function updatePlayerPosition() {
 
     socket.emit('enemyPosition', {
         position: playerPosition,
-        rotation: playerRotation
+        rotation: playerRotation,
+        spotLightVisible: spotLight.visible // スポットライトの状態を送信
     });
 }
+
 
 
 // アニメーションループの中で位置情報を送信する
