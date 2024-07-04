@@ -102,6 +102,7 @@ export function init() {
         if (loadedModels === totalModels) {
             hideLoadingScreen();
             document.getElementById('aiming').style.display = 'block';
+            animate();
         }
     }
 
@@ -345,8 +346,7 @@ export function init() {
     canvas.addEventListener('click', () => {
         canvas.requestPointerLock();
     });
-
-    animate(); // アニメーションループの開始
+    
     updateHpBar();//HPの初期化
 
 }
