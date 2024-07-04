@@ -502,7 +502,7 @@ socket.on('corectPositions', (data) => {
 
 
 
-// アニメーションループ
+// プレイヤの位置を送信する
 function updatePlayerPosition() {
     let playerPosition = {
         x: yawObject.position.x,
