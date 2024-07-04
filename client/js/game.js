@@ -258,20 +258,21 @@ export function init() {
             bearModel.position.set(3, 1.4, 2);
             bearModel.scale.set(0.5, 0.5, 0.5);
             scene.add(bearModel);
-
+    
+            // 敵のスポットライトを初期化
             enemySpotLight = new THREE.SpotLight(0xffffff, 3.5, 100, Math.PI / lightSize, 0.1, 1);
             enemySpotLight.position.set(0, 0, 0);
             enemySpotLight.target.position.set(0, 0, -1);
             enemySpotLight.visible = false; // 初期状態はオフ
             scene.add(enemySpotLight);
             scene.add(enemySpotLight.target);
-
+    
             // ロード完了後にロード画面を非表示にする
             modelLoaded();
         },
         onProgress
     );
-
+    
 
     loader.load(
         'assets/models/gun.glb',
@@ -443,6 +444,8 @@ function onMouseDown(event) {
         shoot(); // 即座に1発目を発射
     } else if (event.button === 2) { // 右クリック
         spotLight.visible = !spotLight.visible;
+        // スポットライトの状態をサーバーに送信
+        updatePlayerPosition();
     }
 }
 
@@ -451,6 +454,7 @@ function onMouseUp(event) {
         isShooting = false;
     }
 }
+
 
 function shoot() {
     if (ammo > 0 && !isReloading) {
@@ -520,9 +524,12 @@ socket.on('corectPositions', (data) => {
         enemySpotLight.target.position.set(targetX, data.positions[enemyId].y, targetZ);
         enemySpotLight.target.updateMatrixWorld(); // ターゲット位置の更新
 
-        enemySpotLight.visible = data.spotLightVisible; // サーバーから受信した状態を反映
+        // サーバーから受信したスポットライトの状態を反映
+        enemySpotLight.visible = data.spotLightStates[enemyId];
     }
 });
+
+
 
 
 
