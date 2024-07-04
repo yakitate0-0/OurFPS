@@ -17,6 +17,7 @@ let ammo = 50;
 let isReloading = false;
 let lastShotTime = 0;
 let nowEnemyPositions = {};
+let bearModel;
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
 const reloadTime = 2000; // リロード時間（ミリ秒）
@@ -252,14 +253,16 @@ export function init() {
     loader.load(
         'assets/models/bear_nomal.glb',
         function (gltf) {
-            gltf.scene.position.set(3, 1.4, 2);
-            gltf.scene.scale.set(0.5, 0.5, 0.5);
-            scene.add(gltf.scene);
+            bearModel = gltf.scene;
+            bearModel.position.set(3, 1.4, 2);
+            bearModel.scale.set(0.5, 0.5, 0.5);
+            scene.add(bearModel);
             // ロード完了後にロード画面を非表示にする
             modelLoaded();
         },
         onProgress
     );
+
 
     loader.load(
         'assets/models/gun.glb',
@@ -478,13 +481,48 @@ function reload() {
 
 socket.on('corectPositions', (data) => {
     console.log('Received corectPositions:', data);
-    // ここで受信した位置データを処理する
+
+    // 敵の位置情報をBearモデルに反映
+    const enemyId = Object.keys(data.positions)[0]; // 1対1のマッチングなので最初のIDを使う
+    if (bearModel && enemyId) {
+        bearModel.position.set(
+            data.positions[enemyId].x,
+            data.positions[enemyId].y,
+            data.positions[enemyId].z
+        );
+        bearModel.rotation.set(
+            data.rotations[enemyId].x,
+            data.rotations[enemyId].y,
+            data.rotations[enemyId].z
+        );
+    }
 });
 
 
-// アニメーションループ
-export function animate() {
 
+// アニメーションループ
+function updatePlayerPosition() {
+    let playerPosition = {
+        x: yawObject.position.x,
+        y: yawObject.position.y,
+        z: yawObject.position.z
+    };
+
+    let playerRotation = {
+        x: yawObject.rotation.x,
+        y: yawObject.rotation.y,
+        z: yawObject.rotation.z
+    };
+
+    socket.emit('enemyPosition', {
+        position: playerPosition,
+        rotation: playerRotation
+    });
+}
+
+
+// アニメーションループの中で位置情報を送信する
+export function animate() {
     requestAnimationFrame(animate);
 
     const delta = clock.getDelta();
@@ -517,7 +555,6 @@ export function animate() {
         velocity.x = 0;
         velocity.z = 0;
     }
-
 
     // 衝突検出
     const playerBox = new THREE.Box3().setFromCenterAndSize(
@@ -558,26 +595,13 @@ export function animate() {
         lastShotTime = currentTime;
     }
 
-    let enemyPosition = {
-        x: yawObject.position.x,
-        y: yawObject.position.y,
-        z: yawObject.position.z
-    };
-
-    let enemyRotation = {
-        x: yawObject.rotation.x,
-        y: yawObject.rotation.y,
-        z: yawObject.rotation.z
-    };
-
-    socket.emit('enemyPosition', {
-        position: enemyPosition,
-        rotation: enemyRotation
-    });
+    updatePlayerPosition(); // プレイヤーの位置情報を送信
 
     if (gunModel) {
-        gunModel.updateMatrixWorld();// 銃の位置を更新
+        gunModel.updateMatrixWorld(); // 銃の位置を更新
     }
 
-    renderer.render(scene, camera); // あいうえお
+    renderer.render(scene, camera);
 }
+
+
