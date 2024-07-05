@@ -629,10 +629,19 @@ function updateHpBar() {
 socket.on('damage', (data) => {
     if (data.enemyId === socket.id) { // playerIdからenemyIdに変更
         playerHp -= data.damage;
+        showDamageOverlay()
         if (playerHp < 0) playerHp = 0;
         updateHpBar();
     }
 });
+
+function showDamageOverlay() {
+    const damageOverlay = document.getElementById('damage-overlay');
+    damageOverlay.style.display = 'block';
+    setTimeout(() => {
+        damageOverlay.style.display = 'none';
+    }, 200); // 0.2秒間赤くする
+}
 
 
 socket.on('updateHP', (data) => {
