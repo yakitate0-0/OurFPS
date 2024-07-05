@@ -346,7 +346,7 @@ export function init() {
     canvas.addEventListener('click', () => {
         canvas.requestPointerLock();
     });
-    
+
     updateHpBar();//HPの初期化
 
 }
@@ -416,6 +416,9 @@ export function onKeyDown(event) {
                 yawObject.position.y = crouchHeight; // 直接高さを変更
             }
             break;
+            case 'KeyR':
+                reload();
+                break;
     }
 }
 
@@ -439,9 +442,6 @@ export function onKeyUp(event) {
             if (!isJumping) {
                 yawObject.position.y = normalHeight; // 直接高さを変更
             }
-            break;
-        case 'KeyR':
-            reload();
             break;
     }
 }
@@ -501,7 +501,7 @@ function reload() {
     }
 }
 
-socket.on('soundofgun',() => {
+socket.on('soundofgun', () => {
     shoot1_sound.currentTime = 0;
     shoot1_sound.play();
 });
@@ -537,7 +537,7 @@ function createBullet() {
     const bulletGeometry = new THREE.SphereGeometry(0.1, 8, 8);
     const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
     const bullet = new THREE.Mesh(bulletGeometry, bulletMaterial);
-    bullet.scale.set(0.1,0.1,0.1);
+    bullet.scale.set(0.1, 0.1, 0.1);
 
     // 弾丸の初期位置をカメラに設定
     bullet.position.copy(camera.position);
