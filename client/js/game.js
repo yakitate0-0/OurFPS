@@ -596,6 +596,7 @@ function checkCollisions() {
         if (!bulletRemoved && bearModel) {
             const bearBox = new THREE.Box3().setFromObject(bearModel);
             if (bulletBox.intersectsBox(bearBox)) {
+                showHitIndicator();
                 // 弾丸を削除
                 bullet.parent.remove(bullet); // カメラ以外に追加された場合に対応
                 bullets.splice(bulletIndex, 1);
@@ -629,18 +630,36 @@ function updateHpBar() {
 socket.on('damage', (data) => {
     if (data.enemyId === socket.id) { // playerIdからenemyIdに変更
         playerHp -= data.damage;
-        showDamageOverlay()
+        showDamageOverlay();
         if (playerHp < 0) playerHp = 0;
         updateHpBar();
     }
 });
 
+function showHitIndicator() {
+    const hitIndicator = document.getElementById('hit-indicator');
+    hitIndicator.style.display = 'block';
+    hitIndicator.style.opacity = '1';
+    hitIndicator.style.animation = 'none'; // アニメーションをリセット
+    requestAnimationFrame(() => {
+        hitIndicator.style.animation = '';
+    });
+    setTimeout(() => {
+        hitIndicator.style.display = 'none';
+    }, 500); // 0.5秒後に非表示にする
+}
+
 function showDamageOverlay() {
     const damageOverlay = document.getElementById('damage-overlay');
     damageOverlay.style.display = 'block';
+    damageOverlay.style.opacity = '1';
+    damageOverlay.style.animation = 'none'; // アニメーションをリセット
+    requestAnimationFrame(() => {
+        damageOverlay.style.animation = '';
+    });
     setTimeout(() => {
         damageOverlay.style.display = 'none';
-    }, 200); // 0.2秒間赤くする
+    }, 500); // 0.5秒後に非表示にする
 }
 
 
