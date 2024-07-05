@@ -174,8 +174,8 @@ export function init() {
                     wallBoxes.push(box); // 床のバウンディングボックスを追加
 
                     // バウンディングボックスの可視化用
-                    const boxHelper = new THREE.BoxHelper(child, 0xffff00);
-                    scene.add(boxHelper);
+                    // const boxHelper = new THREE.BoxHelper(child, 0xffff00);
+                    // scene.add(boxHelper);
 
                     // マテリアルの設定を確認
                     child.material = new THREE.MeshStandardMaterial({
