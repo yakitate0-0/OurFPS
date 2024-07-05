@@ -94,7 +94,7 @@ canvas {
 
 .hit-indicator {
     position: fixed;
-    top: 45%;
+    top: 43%;
     right: 45%;
     font-size: 30px;
     color: yellow;
