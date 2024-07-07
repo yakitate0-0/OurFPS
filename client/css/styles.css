@@ -2,8 +2,7 @@ body {
     margin: 0;
     overflow: hidden;
     cursor: none;
-    height: 100vh;
-    /* 追加: ビューポートの高さを指定 */
+    height: 100vh; /* 追加: ビューポートの高さを指定 */
 }
 
 canvas {
@@ -44,23 +43,19 @@ canvas {
     left: 50%;
     top: 50%;
     transform: translate(-50%, -50%);
-    pointer-events: none;
-    /* 照準がクリックを受け付けないようにする */
-    z-index: 1001;
-    /* ローディング画面の上に表示されるようにする */
+    pointer-events: none; /* 照準がクリックを受け付けないようにする */
+    z-index: 1001; /* ローディング画面の上に表示されるようにする */
 }
 
 #aiming img {
-    width: 50px;
-    /* 照準画像の幅を指定 */
-    height: auto;
-    /* 照準画像の高さを指定 */
+    width: 50px; /* 照準画像の幅を指定 */
+    height: auto; /* 照準画像の高さを指定 */
 }
 
 #hp-bar-container {
     position: fixed;
     bottom: 2vh; /* 画面の高さに対する割合 */
-    right: 75vw; /* 画面の幅に対する割合 */
+    left: 2vw; /* 画面の幅に対する割合 */
     width: 20vw; /* 画面の幅に対する割合 */
     height: 5vh; /* 画面の高さに対する割合 */
     background: rgba(0, 0, 0, 0.7); /* 半透明の黒背景 */
@@ -81,20 +76,16 @@ canvas {
     transition: width 0.3s ease-in-out; /* 幅の変更時にアニメーションを追加 */
 }
 
-
 #damage-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 0, 0, 0.7);
-    /* 半透明の赤 */
+    background-color: rgba(255, 0, 0, 0.7); /* 半透明の赤 */
     display: none;
-    z-index: 1000;
-    /* 他の要素の上に表示 */
-    pointer-events: none;
-    /* クリックなどのイベントを無効化 */
+    z-index: 1000; /* 他の要素の上に表示 */
+    pointer-events: none; /* クリックなどのイベントを無効化 */
     animation: fadeOut 0.5s ease-out forwards;
 }
 
@@ -114,7 +105,6 @@ canvas {
     from {
         opacity: 1;
     }
-
     to {
         opacity: 0;
     }
@@ -124,21 +114,15 @@ canvas {
     from {
         opacity: 1;
     }
-
     to {
         opacity: 0;
     }
 }
 
-
-
 @keyframes blink {
-
-    0%,
-    100% {
+    0%, 100% {
         opacity: 1;
     }
-
     50% {
         opacity: 0.5;
     }

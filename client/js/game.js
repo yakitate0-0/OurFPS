@@ -22,6 +22,8 @@ let enemySpotLight; // 敵のスポットライト
 let bullets = []; // 弾丸を格納する配列
 let collisionBoxes = []; // 衝突判定の対象となるオブジェクトのバウンディングボックス配列
 let playerHp = 100; // 初期HP
+let pitchObject = new THREE.Object3D();
+let yawObject = new THREE.Object3D();
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
@@ -30,8 +32,6 @@ const totalModels = 5; // 読み込むモデルの総数
 const jumpSpeed = 9.0;
 const gravity = 30.0;
 const clock = new THREE.Clock();
-const pitchObject = new THREE.Object3D();
-const yawObject = new THREE.Object3D();
 const normalSpeed = 60.0;
 const crouchSpeed = 20.0; // しゃがみ時の速度
 const normalHeight = 1.5; // 通常時の高さ
@@ -776,6 +776,32 @@ export function animate() {
 
     renderer.render(scene, camera);
 }
+
+document.addEventListener('DOMContentLoaded', () => {
+    const socket = io();
+    let gameId, opponentId;
+
+    // Join matchmaking button
+    const joinMatchmakingBtn = document.getElementById('joinMatchmakingBtn');
+    if (joinMatchmakingBtn) {
+        joinMatchmakingBtn.addEventListener('click', () => {
+            socket.emit('joinMatchmaking');
+        });
+    }
+
+    socket.on('matchFound', (data) => {
+        gameId = data.gameId;
+        opponentId = data.opponentId;
+        console.log(`Match found! Game ID: ${gameId}, Opponent ID: ${opponentId}`);
+        init(); // ゲームを開始
+    });
+
+    socket.on('gameOver', (data) => {
+        const message = data.winnerId === socket.id ? 'You Win!' : 'You Lose!';
+        alert(message);
+    });
+});
+
 
 socket.on('gameOver', (data) => {
     const message = data.winnerId === socket.id ? 'You Win!' : 'You Lose!';
