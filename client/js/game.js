@@ -416,9 +416,9 @@ export function onKeyDown(event) {
                 yawObject.position.y = crouchHeight; // 直接高さを変更
             }
             break;
-            case 'KeyR':
-                reload();
-                break;
+        case 'KeyR':
+            reload();
+            break;
     }
 }
 

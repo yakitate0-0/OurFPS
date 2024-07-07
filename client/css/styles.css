@@ -33,15 +33,10 @@ canvas {
 
 #FPSCanvas {
     width: 100vw;
-    /* ビューポートの幅の100% */
     height: 100vh;
-    /* ビューポートの高さの100% */
     display: block;
-    /* ブラウザの標準スタイルリセット */
     margin: 0;
-    /* デフォルトのマージンをリセット */
     padding: 0;
-    /* デフォルトのパディングをリセット */
 }
 
 #aiming {
@@ -56,28 +51,36 @@ canvas {
 }
 
 #aiming img {
-    width: 50px; /* 照準画像の幅を指定 */
-    height: auto; /* 照準画像の高さを指定 */
+    width: 50px;
+    /* 照準画像の幅を指定 */
+    height: auto;
+    /* 照準画像の高さを指定 */
 }
 
 #hp-bar-container {
     position: fixed;
-    bottom: 20px;
-    right: 20px;
-    width: 200px;
-    height: 20px;
-    background-color: rgba(255, 0, 0, 0.3); /* 半透明の赤背景 */
-    border: 2px solid #ff0000; /* 赤の枠線 */
+    bottom: 2vh; /* 画面の高さに対する割合 */
+    right: 2vw; /* 画面の幅に対する割合 */
+    width: 20vw; /* 画面の幅に対する割合 */
+    height: 5vh; /* 画面の高さに対する割合 */
+    background: rgba(0, 0, 0, 0.7); /* 半透明の黒背景 */
+    border-radius: 2.5vh; /* 丸みを帯びた角 */
+    border: 0.2vh solid #ff0000; /* 赤の枠線 */
+    box-shadow: 0 0 1.5vh rgba(255, 0, 0, 0.5); /* 光の効果 */
+    overflow: hidden; /* 丸みを帯びた角に対して内部の要素がはみ出さないようにする */
     z-index: 1001;
-
+    display: flex; /* 子要素の配置をフレックスボックスに */
+    align-items: center; /* 縦方向中央揃え */
 }
 
 #hp-bar {
-    width: 100%;
-    height: 100%;
-    background-color: whitesmoke; /* 白 */
-    z-index: 1001;
+    width: 100%; /* HPの初期値として100% */
+    height: 100%; /* 高さを少し小さくして調整 */
+    background: linear-gradient(to right, #ff0000, #ff8000); /* 赤からオレンジへのグラデーション */
+    border-radius: 2vh; /* 丸みを帯びた角を少し調整 */
+    transition: width 0.3s ease-in-out; /* 幅の変更時にアニメーションを追加 */
 }
+
 
 #damage-overlay {
     position: fixed;
@@ -85,10 +88,13 @@ canvas {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 0, 0, 0.7); /* 半透明の赤 */
+    background-color: rgba(255, 0, 0, 0.7);
+    /* 半透明の赤 */
     display: none;
-    z-index: 1000; /* 他の要素の上に表示 */
-    pointer-events: none; /* クリックなどのイベントを無効化 */
+    z-index: 1000;
+    /* 他の要素の上に表示 */
+    pointer-events: none;
+    /* クリックなどのイベントを無効化 */
     animation: fadeOut 0.5s ease-out forwards;
 }
 
@@ -108,6 +114,7 @@ canvas {
     from {
         opacity: 1;
     }
+
     to {
         opacity: 0;
     }
@@ -117,6 +124,7 @@ canvas {
     from {
         opacity: 1;
     }
+
     to {
         opacity: 0;
     }
