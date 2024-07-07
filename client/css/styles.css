@@ -60,7 +60,7 @@ canvas {
 #hp-bar-container {
     position: fixed;
     bottom: 2vh; /* 画面の高さに対する割合 */
-    right: 2vw; /* 画面の幅に対する割合 */
+    right: 75vw; /* 画面の幅に対する割合 */
     width: 20vw; /* 画面の幅に対する割合 */
     height: 5vh; /* 画面の高さに対する割合 */
     background: rgba(0, 0, 0, 0.7); /* 半透明の黒背景 */
