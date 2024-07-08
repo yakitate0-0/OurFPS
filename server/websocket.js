@@ -2,11 +2,7 @@ let positions = {}; // クライアントごとのカメラ位置情報を保存
 let rotations = {};
 let spotLightStates = {}; // スポットライトの状態を保存するオブジェクト
 let playerHps = {}; // プレイヤーごとのHPを保存するオブジェクト
-let playersInGame = {}; // ゲームに参加中のプレイヤーを保存するオブジェクト
-const spawnPositions = [
-    { x: 8, y: 0, z: -5 }, // 左端のスポーン位置
-    { x: 8, y: 0, z: 5 }   // 右端のスポーン位置
-];
+let waitingPlayer = null; // マッチング待機中のプレイヤー
 
 function setupWebSocket(io) {
     io.on('connection', (socket) => {
@@ -14,19 +10,6 @@ function setupWebSocket(io) {
 
         // 初期HPを設定
         playerHps[socket.id] = 100;
-
-        // プレイヤーのスポーン位置を決定
-        const playerCount = Object.keys(playersInGame).length;
-        const spawnPosition = spawnPositions[playerCount % spawnPositions.length];
-        positions[socket.id] = spawnPosition;
-        rotations[socket.id] = { x: 0, y: 0, z: 0 };
-        playersInGame[socket.id] = true;
-
-        // クライアントにスポーン位置を送信
-        socket.emit('spawn', {
-            position: spawnPosition,
-            rotation: rotations[socket.id]
-        });
 
         // クライアントからカメラ位置情報を受信して更新する
         socket.on('enemyPosition', (data) => {
@@ -85,7 +68,6 @@ function setupWebSocket(io) {
             delete rotations[socket.id];
             delete spotLightStates[socket.id]; // スポットライトの状態を削除
             delete playerHps[socket.id]; // プレイヤーのHPを削除
-            delete playersInGame[socket.id]; // ゲームからプレイヤーを削除
 
             // クライアント切断後のデータをブロードキャスト
             io.emit('corectPositions', {
@@ -93,6 +75,20 @@ function setupWebSocket(io) {
                 rotations: rotations,
                 spotLightStates: spotLightStates // スポットライトの状態を送信
             });
+        });
+
+        // マッチング処理
+        socket.on('joinMatchmaking', () => {
+            if (waitingPlayer) {
+                // 既に待機中のプレイヤーがいる場合
+                const gameId = `${waitingPlayer.id}-${socket.id}`;
+                io.to(waitingPlayer.id).emit('matchFound', { gameId, opponentId: socket.id });
+                io.to(socket.id).emit('matchFound', { gameId, opponentId: waitingPlayer.id });
+                waitingPlayer = null;
+            } else {
+                // 待機中のプレイヤーがいない場合
+                waitingPlayer = socket;
+            }
         });
     });
 }

@@ -50,6 +50,11 @@ let wallBoxes = []; // 壁のバウンディングボックスを格納する配
 
 // 初期化関数
 export function init() {
+
+    if (document.body) {
+        document.body.style.cursor = 'none';
+    }
+
     // ロード画面の表示
     showLoadingScreen();
     document.getElementById('aiming').style.display = 'none';
@@ -266,7 +271,7 @@ export function init() {
         'assets/models/bear_nomal.glb',
         function (gltf) {
             bearModel = gltf.scene;
-            bearModel.position.set(3, 1.4, 2);
+            // bearModel.position.set(3, 1.4, 2);
             bearModel.scale.set(0.5, 0.5, 0.5);
             scene.add(bearModel);
 
@@ -692,6 +697,12 @@ function updatePlayerPosition() {
 }
 
 
+socket.on('spawn', (data) => {
+    const { position, rotation } = data;
+    yawObject.position.set(position.x, position.y, position.z);
+    yawObject.rotation.set(rotation.x, rotation.y, rotation.z);
+});
+
 export function animate() {
     requestAnimationFrame(animate);
 
@@ -776,34 +787,3 @@ export function animate() {
 
     renderer.render(scene, camera);
 }
-
-document.addEventListener('DOMContentLoaded', () => {
-    const socket = io();
-    let gameId, opponentId;
-
-    // Join matchmaking button
-    const joinMatchmakingBtn = document.getElementById('joinMatchmakingBtn');
-    if (joinMatchmakingBtn) {
-        joinMatchmakingBtn.addEventListener('click', () => {
-            socket.emit('joinMatchmaking');
-        });
-    }
-
-    socket.on('matchFound', (data) => {
-        gameId = data.gameId;
-        opponentId = data.opponentId;
-        console.log(`Match found! Game ID: ${gameId}, Opponent ID: ${opponentId}`);
-        init(); // ゲームを開始
-    });
-
-    socket.on('gameOver', (data) => {
-        const message = data.winnerId === socket.id ? 'You Win!' : 'You Lose!';
-        alert(message);
-    });
-});
-
-
-socket.on('gameOver', (data) => {
-    const message = data.winnerId === socket.id ? 'You Win!' : 'You Lose!';
-    alert(message);
-});

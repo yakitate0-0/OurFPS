@@ -1,11 +1,12 @@
 <!DOCTYPE html>
 <html lang="ja">
+
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>FPS Game</title>
-    <link rel="stylesheet" href="./css/styles.css">
-    <script type="importmap">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>FPS Game</title>
+  <link rel="stylesheet" href="./css/styles.css">
+  <script type="importmap">
     {
       "imports": {
         "three": "https://unpkg.com/three@v0.151.3/build/three.module.js",
@@ -13,24 +14,32 @@
         "cannon-es": "https://cdn.jsdelivr.net/npm/cannon-es@0.18.0/dist/cannon-es.js"
       }
     }
-    </script>
-    <script src="/socket.io/socket.io.js"></script>
+  </script>
+  <script src="/socket.io/socket.io.js"></script>
 </head>
+
 <body>
-    <canvas id="FPSCanvas"></canvas>
-    <div id="aiming">
-        <img src="assets/images/aiming.png" alt=".">
-    </div>
-    <div id="damage-overlay"></div>
-    <div id="hit-indicator" class="hit-indicator">hit</div>
-    <div id="loading-screen">
-        <div id="loading-text">Loading: 0%</div>
-    </div>
-    <div id="aming">.</div>
-    <canvas id="FirstCanvas"></canvas>
-    <div id="hp-bar-container">
-        <div id="hp-bar"></div>
-    </div>
-    <script type="module" src="./js/main.js"></script>
+  <canvas id="matchmakingCanvas"></canvas>
+  <div id="matchmaking">
+    <button id="joinMatchmakingBtn">Join Matchmaking</button>
+  </div>
+  <div id="loading-spinner"></div>
+
+  <canvas id="FPSCanvas"></canvas>
+  <div id="aiming">
+    <img src="assets/images/aiming.png" alt=".">
+  </div>
+  <div id="damage-overlay"></div>
+  <div id="hit-indicator" class="hit-indicator">hit</div>
+
+  <div id="loading-screen">
+    <div id="loading-text">Loading: 0%</div>
+  </div>
+  <div id="aming">.</div>
+  <div id="hp-bar-container">
+    <div id="hp-bar"></div>
+  </div>
+  <script type="module" src="./js/main.js"></script>
 </body>
+
 </html>
