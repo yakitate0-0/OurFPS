@@ -24,6 +24,7 @@ let collisionBoxes = []; // 衝突判定の対象となるオブジェクトの�
 let playerHp = 100; // 初期HP
 let pitchObject = new THREE.Object3D();
 let yawObject = new THREE.Object3D();
+let playerName = '';
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
@@ -47,6 +48,11 @@ const ready_sound = new Audio("/assets/sounds/ready.mp3");
 const set_sound = new Audio("/assets/sounds/set.mp3");
 
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
+
+socket.on('registered', data => {
+    console.log('Registered as', data.name);
+    document.getElementById('matchmaking').style.display = 'block';
+});
 
 // 初期化関数
 export function init() {
@@ -608,15 +614,16 @@ function checkCollisions() {
                 bulletRemoved = true; // すでに衝突した弾丸についてはこれ以上処理しない
 
                 // 敵にダメージを通告
-                const enemyId = Object.keys(nowEnemyPositions).find(id => id !== socket.id);
-                if (enemyId) {
-                    console.log('Hit bear! Sending hit to enemyId:', enemyId); // デバッグログを追加
+                const enemyName = Object.keys(nowEnemyPositions).find(name => name !== playerName);
+                if (enemyName) {
+                    console.log('Hit bear! Sending hit to enemyName:', enemyName); // デバッグログを追加
                     socket.emit('hit', {
-                        enemyId: enemyId,
+                        target: enemyName,
+                        shooter: playerName,
                         damage: 10 // ダメージ量を指定
                     });
                 } else {
-                    console.log("Do not have enemyID");
+                    console.log("Do not have enemyName");
                 }
             }
         }

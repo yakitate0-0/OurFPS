@@ -19,14 +19,17 @@
 </head>
 
 <body>
-  <canvas id="matchmakingCanvas"></canvas>
-  <div id="matchmaking">
+  <div id="register-section">
+    <input type="text" id="playerNameInput" placeholder="Enter your name">
+    <button id="registerBtn">Register</button>
+  </div>
+  <div id="matchmaking" style="display:none;">
     <button id="joinMatchmakingBtn">Join Matchmaking</button>
   </div>
-  <div id="loading-spinner"></div>
+  <div id="loading-spinner" style="display:none;"></div>
 
-  <canvas id="FPSCanvas"></canvas>
-  <div id="aiming">
+  <canvas id="FPSCanvas" style="display:none;"></canvas>
+  <div id="aiming" style="display:none;">
     <img src="assets/images/aiming.png" alt=".">
   </div>
   <div id="damage-overlay"></div>
@@ -35,7 +38,6 @@
   <div id="loading-screen">
     <div id="loading-text">Loading: 0%</div>
   </div>
-  <div id="aming">.</div>
   <div id="hp-bar-container">
     <div id="hp-bar"></div>
   </div>

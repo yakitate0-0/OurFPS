@@ -2,7 +2,7 @@ body {
     margin: 0;
     overflow: hidden;
     cursor: auto;
-    height: 100vh; /* 追加: ビューポートの高さを指定 */
+    height: 100vh; /* ビューポートの高さを指定 */
 }
 
 canvas {
@@ -11,12 +11,27 @@ canvas {
     padding: 0;
 }
 
-#matchmakingCanvas {
-    width: 100vw;
-    height: 100vh;
-    display: block;
-    margin: 0;
-    padding: 0;
+#register-section {
+    position: fixed;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    z-index: 1002; /* ローディング画面よりも上に表示 */
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+}
+
+#playerNameInput {
+    padding: 10px;
+    font-size: 18px;
+    margin-bottom: 10px;
+}
+
+#registerBtn {
+    padding: 10px 20px;
+    font-size: 18px;
+    cursor: pointer;
 }
 
 #matchmaking {
@@ -123,20 +138,16 @@ canvas {
     transition: width 0.3s ease-in-out; /* 幅の変更時にアニメーションを追加 */
 }
 
-
 #damage-overlay {
     position: fixed;
     top: 0;
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 0, 0, 0.7);
-    /* 半透明の赤 */
+    background-color: rgba(255, 0, 0, 0.7); /* 半透明の赤 */
     display: none;
-    z-index: 1000;
-    /* 他の要素の上に表示 */
-    pointer-events: none;
-    /* クリックなどのイベントを無効化 */
+    z-index: 1000; /* 他の要素の上に表示 */
+    pointer-events: none; /* クリックなどのイベントを無効化 */
     animation: fadeOut 0.5s ease-out forwards;
 }
 
@@ -156,7 +167,6 @@ canvas {
     from {
         opacity: 1;
     }
-
     to {
         opacity: 0;
     }
@@ -166,19 +176,15 @@ canvas {
     from {
         opacity: 1;
     }
-
     to {
         opacity: 0;
     }
 }
 
 @keyframes blink {
-
-    0%,
-    100% {
+    0%, 100% {
         opacity: 1;
     }
-
     50% {
         opacity: 0.5;
     }

@@ -3,7 +3,6 @@ const http = require('http');
 const path = require('path');
 const socketIo = require('socket.io');
 const { setupWebSocket } = require('./websocket');
-const { initializeGameLogic } = require('./gamelogic');
 
 const app = express();
 const server = http.createServer(app);
@@ -22,9 +21,6 @@ app.get('/', (req, res) => {
 
 // WebSocketの設定
 setupWebSocket(io);
-
-// ゲームロジックの初期化
-initializeGameLogic();
 
 // サーバーの起動
 server.listen(port, () => {
