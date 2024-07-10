@@ -26,6 +26,18 @@ function setupWebSocket(io) {
                 io.to(gameId).emit('matchFound', { gameId, opponentName: waitingPlayer, playerName: name });
                 players[name].inGame = true;
                 players[waitingPlayer].inGame = true;
+
+                io.emit('spawn', {
+                    name: name,
+                    position: { x: 9, y: 1.5, z: -8 },
+                    rotation: { x: 0, y: 0, z: 0 }
+                });
+                io.emit('spawn', {
+                    name: waitingPlayer,
+                    position: { x: -9, y: 1.5, z: 8 },
+                    rotation: { x: 0, y: Math.PI, z: 0 }
+                });
+
                 waitingPlayer = null; // マッチングが成立したのでリセット
             } else {
                 waitingPlayer = name;
@@ -34,7 +46,7 @@ function setupWebSocket(io) {
         });
 
 
-        socket.on('gunsound',() => {
+        socket.on('gunsound', () => {
             io.emit('soundofgun');
         });
 

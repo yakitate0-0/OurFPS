@@ -27,6 +27,7 @@ let yawObject = new THREE.Object3D();
 let playerName = window.myname;
 let enemyName = window.enemyName;
 let shaking = 1; //横の球ブレ
+let damegepala = 10; //球のダメージ数
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
@@ -619,7 +620,7 @@ function checkCollisions() {
                     console.log('Hit bear! Sending hit to enemyName:', enemyName); // デバッグログを追加
                     socket.emit('hit', {
                         enemyName: enemyName,
-                        damage: 10 // ダメージ量を指定
+                        damage: damegepala // ダメージ量を指定
                     });
                 } else {
                     console.error("Do not have enemyName");
@@ -705,10 +706,14 @@ function updatePlayerPosition() {
 
 
 socket.on('spawn', (data) => {
-    const { position, rotation } = data;
-    yawObject.position.set(position.x, position.y, position.z);
-    yawObject.rotation.set(rotation.x, rotation.y, rotation.z);
+    const { name, position, rotation } = data;
+    if (name === playerName) {
+        yawObject.position.set(position.x, position.y, position.z);
+        yawObject.rotation.set(rotation.x, rotation.y, rotation.z);
+        console.log(`Player ${name} spawned at position (${position.x}, ${position.y}, ${position.z})`);
+    }
 });
+
 
 export function animate() {
     requestAnimationFrame(animate);
