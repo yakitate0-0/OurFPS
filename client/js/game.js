@@ -103,7 +103,7 @@ export function init(receivedEnemyName) {
     function onProgress(xhr) {
         if (xhr.lengthComputable) {
             const percentComplete = Math.round((xhr.loaded / xhr.total) * 100);
-            document.getElementById('loading-screen').style.display = "flex";
+            // document.getElementById('loading-screen').style.display = "flex";
             document.getElementById('loading-text').innerText = `Loading: ${percentComplete}%`;
         }
     }
@@ -112,6 +112,7 @@ export function init(receivedEnemyName) {
         loadedModels++;
         if (loadedModels === totalModels) {
             hideLoadingScreen();
+            console.log("load completed.");
             document.getElementById('aiming').style.display = 'block';
             animate();
         }
