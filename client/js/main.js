@@ -41,6 +41,7 @@ socket.on('matchFound', data => {
 });
 
 socket.on('gameOver', data => {
-    const message = data.winner === playerName ? 'You Win!' : 'You Lose!';
+    console.log(`loser is ${data.loser}`);
+    const message = data.loser === window.myname ? 'You Lose!' : 'You Win!';
     alert(message);
 });

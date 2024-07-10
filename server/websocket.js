@@ -57,7 +57,7 @@ function setupWebSocket(io) {
                 players[enemyName].hp -= damage;
                 if (players[enemyName].hp <= 0) {
                     players[enemyName].hp = 0;
-                    io.emit('gameOver', { winner: data.shooter, loser: enemyName });
+                    io.emit('gameOver', { loser: enemyName });
                 }
                 io.emit('damage', { enemyName: players[enemyName], damage: damage });
             } else {
