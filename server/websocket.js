@@ -45,27 +45,25 @@ function setupWebSocket(io) {
             }
         });
 
-
-
         socket.on('shoot', data => {
             const { shooter, position, direction } = data;
             io.emit('shotFired', { shooter, position, direction });
         });
 
         socket.on('hit', data => {
-            const { target, damage, shooter } = data;
-            if (players[target]) {
-                players[target].hp -= damage;
-                if (players[target].hp <= 0) {
-                    players[target].hp = 0;
-                    io.emit('gameOver', { winner: shooter, loser: target });
+            const { enemyName, damage } = data;
+            console.log(players[enemyName]);
+            if (players[enemyName]) {
+                players[enemyName].hp -= damage;
+                if (players[enemyName].hp <= 0) {
+                    players[enemyName].hp = 0;
+                    io.emit('gameOver', { winner: data.shooter, loser: enemyName });
                 }
-                io.emit('updateHP', { name: target, hp: players[target].hp });
+                io.emit('damage', { enemyName: players[enemyName], damage: damage });
             } else {
                 console.log("Do not have enemyID");
             }
         });
-
 
         socket.on('disconnect', () => {
             // 名前を使ってプレイヤーを識別

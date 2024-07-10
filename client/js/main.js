@@ -2,7 +2,6 @@ import { init, animate } from "./game.js";
 
 const socket = io();
 let playerName = '';
-let myname = '';
 document.getElementById('registerBtn').addEventListener('click', () => {
     playerName = document.getElementById('playerNameInput').value;
     socket.emit('register', playerName);
@@ -10,7 +9,7 @@ document.getElementById('registerBtn').addEventListener('click', () => {
 
 socket.on('registered', data => {
     console.log('Registered as', data.name);
-    myname = data.name;
+    window.myname = data.name;
     document.getElementById('register-section').style.display = 'none';
     document.getElementById('matchmaking').style.display = 'block';
 });
@@ -23,13 +22,13 @@ document.getElementById('joinMatchmakingBtn').addEventListener('click', () => {
 
 socket.on('matchFound', data => {
     const gameId = data.gameId;
-    if (myname == data.playerName) {
+    if (window.myname == data.playerName) {
         window.enemyName = data.opponentName; // グローバル変数に格納
     } else {
         window.enemyName = data.playerName;
     }
 
-    console.log(`my name is ${myname}`);
+    console.log(`my name is ${window.myname}`);
 
     console.log(`Match found! Game ID: ${gameId}, Opponent Name: ${window.enemyName},playername: ${playerName}`);
     document.getElementById('loading-spinner').style.display = 'none';
@@ -37,7 +36,7 @@ socket.on('matchFound', data => {
     document.getElementById('aiming').style.display = 'block';
 
     // ゲームを開始
-    init(window.enemyName); // 初期化関数に敵の名前を渡す
+    init(window.enemyName, window.myname); // 初期化関数に敵の名前を渡す
     animate();
 });
 

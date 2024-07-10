@@ -24,7 +24,7 @@ let collisionBoxes = []; // 衝突判定の対象となるオブジェクトの�
 let playerHp = 100; // 初期HP
 let pitchObject = new THREE.Object3D();
 let yawObject = new THREE.Object3D();
-let playerName = '';
+let playerName = window.myname;
 let enemyName = window.enemyName;
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
@@ -51,9 +51,11 @@ const set_sound = new Audio("/assets/sounds/set.mp3");
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
 // 初期化関数
-export function init(receivedEnemyName) {
+export function init(receivedEnemyName,receivedPlayername) {
 
     enemyName = receivedEnemyName;
+    playerName = receivedPlayername;
+    console.log(playerName);
     console.log('Initializing game with enemyName:', enemyName);
 
     if (document.body) {
@@ -666,11 +668,17 @@ function updateHpBar() {
 }
 
 socket.on('damage', (data) => {
-    if (data.enemyId === socket.id) { // playerIdからenemyIdに変更
+    const hp = data.damage;
+    const playerId = data.enemyName;
+    console.log(playerName);
+    if (data.enemyName === playerName) { // playerIdからenemyIdに変更
+        console.log(`Player ${playerId} HP updated: ${hp}`);
         playerHp -= data.damage;
         showDamageOverlay();
         if (playerHp < 0) playerHp = 0;
         updateHpBar();
+    }else {
+        console.warn("I am not get damage");
     }
 });
 
@@ -699,14 +707,6 @@ function showDamageOverlay() {
         damageOverlay.style.display = 'none';
     }, 500); // 0.5秒後に非表示にする
 }
-
-
-socket.on('updateHP', (data) => {
-    const playerId = data.playerId;
-    const hp = data.hp;
-    console.log(`Player ${playerId} HP updated: ${hp}`);
-    // 他のプレイヤーのHPが更新された場合の処理を追加することもできます
-});
 
 // プレイヤの位置を送信する
 function updatePlayerPosition() {
