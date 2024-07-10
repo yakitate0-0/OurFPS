@@ -26,6 +26,7 @@ let pitchObject = new THREE.Object3D();
 let yawObject = new THREE.Object3D();
 let playerName = window.myname;
 let enemyName = window.enemyName;
+let shaking = 1; //横の球ブレ
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
@@ -493,10 +494,9 @@ function shoot() {
 }
 
 function applyRecoil() {
-    // リコイルの実装（上向きに修正）
     const recoilAmount = 0.05;
-    pitchObject.rotation.x += recoilAmount; // マイナスからプラスに変更
-    yawObject.rotation.y += (Math.random() - 0.5) * recoilAmount * 0.5; // 左右のブレを少し小さくする
+    pitchObject.rotation.x += recoilAmount;
+    yawObject.rotation.y += (Math.random() - 0.5) * recoilAmount * shaking; // 左右のブレを少し小さくする
 }
 
 function reload() {
