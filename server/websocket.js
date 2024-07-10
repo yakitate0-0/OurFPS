@@ -23,7 +23,7 @@ function setupWebSocket(io) {
                 const gameId = `${name}-${waitingPlayer}`;
                 socket.join(gameId);
                 io.sockets.sockets.get(players[waitingPlayer].socketId).join(gameId); // 修正点
-                io.to(gameId).emit('matchFound', { gameId, opponentName: waitingPlayer });
+                io.to(gameId).emit('matchFound', { gameId, opponentName: waitingPlayer, playerName: name });
                 players[name].inGame = true;
                 players[waitingPlayer].inGame = true;
                 waitingPlayer = null; // マッチングが成立したのでリセット
@@ -39,16 +39,19 @@ function setupWebSocket(io) {
                 players[name].position = position;
                 players[name].rotation = rotation;
                 players[name].spotLightState = spotLightState;
+                console.log(`Position updated for ${name}`, position, rotation, spotLightState); // デバッグログ
                 // 全プレイヤーに位置情報をブロードキャスト（必要に応じて）
-                io.emit('updatePositions', { name, position, rotation, spotLightState });
+                io.emit('updatePositions', players);
             }
         });
+
+
 
         socket.on('shoot', data => {
             const { shooter, position, direction } = data;
             io.emit('shotFired', { shooter, position, direction });
         });
-        
+
         socket.on('hit', data => {
             const { target, damage, shooter } = data;
             if (players[target]) {
@@ -62,7 +65,7 @@ function setupWebSocket(io) {
                 console.log("Do not have enemyID");
             }
         });
-        
+
 
         socket.on('disconnect', () => {
             // 名前を使ってプレイヤーを識別

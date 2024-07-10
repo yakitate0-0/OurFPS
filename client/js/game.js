@@ -25,6 +25,7 @@ let playerHp = 100; // 初期HP
 let pitchObject = new THREE.Object3D();
 let yawObject = new THREE.Object3D();
 let playerName = '';
+let enemyName = window.enemyName;
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
@@ -49,13 +50,11 @@ const set_sound = new Audio("/assets/sounds/set.mp3");
 
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
-socket.on('registered', data => {
-    console.log('Registered as', data.name);
-    document.getElementById('matchmaking').style.display = 'block';
-});
-
 // 初期化関数
-export function init() {
+export function init(receivedEnemyName) {
+
+    enemyName = receivedEnemyName;
+    console.log('Initializing game with enemyName:', enemyName);
 
     if (document.body) {
         document.body.style.cursor = 'none';
@@ -104,6 +103,7 @@ export function init() {
     function onProgress(xhr) {
         if (xhr.lengthComputable) {
             const percentComplete = Math.round((xhr.loaded / xhr.total) * 100);
+            document.getElementById('loading-screen').style.display = "flex";
             document.getElementById('loading-text').innerText = `Loading: ${percentComplete}%`;
         }
     }
@@ -585,7 +585,32 @@ function moveBullets(delta) {
     });
 }
 
+socket.on('updatePositions', data => {
+    console.log('Received updated positions:', data); // デバッグログ
+    nowEnemyPositions = data; // すべてのプレイヤーの位置情報を更新
 
+    // 敵の位置情報をBearモデルに反映
+    if (bearModel && enemyName) {
+        console.log(`Updating enemy position for ${enemyName}`); // デバッグログ
+        const enemyPosition = data[enemyName].position;
+        const enemyRotation = data[enemyName].rotation;
+
+        bearModel.position.set(enemyPosition.x, enemyPosition.y, enemyPosition.z);
+        bearModel.rotation.set(enemyRotation.x, enemyRotation.y + Math.PI, enemyRotation.z);
+
+        // 敵のスポットライトの位置と方向をBearモデルと同期
+        enemySpotLight.position.copy(bearModel.position);
+        enemySpotLight.target.position.set(
+            enemyPosition.x + Math.sin(enemyRotation.y + Math.PI),
+            enemyPosition.y,
+            enemyPosition.z + Math.cos(enemyRotation.y + Math.PI)
+        );
+        enemySpotLight.target.updateMatrixWorld();
+
+        // サーバーから受信したスポットライトの状態を反映
+        enemySpotLight.visible = data[enemyName].spotLightState;
+    }
+});
 
 function checkCollisions() {
     bullets.forEach((bullet, bulletIndex) => {
@@ -614,21 +639,21 @@ function checkCollisions() {
                 bulletRemoved = true; // すでに衝突した弾丸についてはこれ以上処理しない
 
                 // 敵にダメージを通告
-                const enemyName = Object.keys(nowEnemyPositions).find(name => name !== playerName);
                 if (enemyName) {
                     console.log('Hit bear! Sending hit to enemyName:', enemyName); // デバッグログを追加
                     socket.emit('hit', {
-                        target: enemyName,
-                        shooter: playerName,
+                        enemyName: enemyName,
                         damage: 10 // ダメージ量を指定
                     });
                 } else {
-                    console.log("Do not have enemyName");
+                    console.error("Do not have enemyName");
+                    console.log(enemyName);
                 }
             }
         }
     });
 }
+
 
 function updateHpBar() {
     const hpBar = document.getElementById('hp-bar');

@@ -1,48 +1,47 @@
-import { init, animate } from './game.js';
+import { init, animate } from "./game.js";
 
 const socket = io();
-
+let playerName = '';
+let myname = '';
 document.getElementById('registerBtn').addEventListener('click', () => {
-    const playerName = document.getElementById('playerNameInput').value;
-    if (playerName) {
-        socket.emit('register', playerName);
-    }
+    playerName = document.getElementById('playerNameInput').value;
+    socket.emit('register', playerName);
 });
 
-document.getElementById('joinMatchmakingBtn').addEventListener('click', () => {
-    const playerName = document.getElementById('playerNameInput').value;
-    if (playerName) {
-        document.getElementById('matchmaking').style.display = 'none';
-        document.getElementById('loading-spinner').style.display = 'block';
-        socket.emit('joinMatchmaking', playerName);
-    }
-});
-
-socket.on('registered', (data) => {
+socket.on('registered', data => {
     console.log('Registered as', data.name);
+    myname = data.name;
     document.getElementById('register-section').style.display = 'none';
     document.getElementById('matchmaking').style.display = 'block';
 });
 
-socket.on('matchFound', (data) => {
-    const gameId = data.gameId;
-    const opponentName = data.opponentName;
-    console.log(`Match found! Game ID: ${gameId}, Opponent Name: ${opponentName}`);
+document.getElementById('joinMatchmakingBtn').addEventListener('click', () => {
+    document.getElementById('matchmaking').style.display = 'none';
+    document.getElementById('loading-spinner').style.display = 'block';
+    socket.emit('joinMatchmaking', playerName);
+});
 
+socket.on('matchFound', data => {
+    const gameId = data.gameId;
+    if (myname == data.playerName) {
+        window.enemyName = data.opponentName; // グローバル変数に格納
+    } else {
+        window.enemyName = data.playerName;
+    }
+
+    console.log(`my name is ${myname}`);
+
+    console.log(`Match found! Game ID: ${gameId}, Opponent Name: ${window.enemyName},playername: ${playerName}`);
     document.getElementById('loading-spinner').style.display = 'none';
     document.getElementById('FPSCanvas').style.display = 'block';
     document.getElementById('aiming').style.display = 'block';
 
     // ゲームを開始
-    init();
+    init(window.enemyName); // 初期化関数に敵の名前を渡す
     animate();
 });
 
-socket.on('gameOver', (data) => {
-    const message = data.winner === socket.id ? 'You Win!' : 'You Lose!';
+socket.on('gameOver', data => {
+    const message = data.winner === playerName ? 'You Win!' : 'You Lose!';
     alert(message);
-});
-
-socket.on('waiting', (message) => {
-    console.log(message);
 });
