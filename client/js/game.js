@@ -669,9 +669,9 @@ function updateHpBar() {
 
 socket.on('damage', (data) => {
     const hp = data.damage;
-    const playerId = data.enemyName;
-    console.log(playerName);
-    if (data.enemyName === playerName) { // playerIdからenemyIdに変更
+    const playerId = data.enemyName.name;
+    console.log(playerId);
+    if (playerId === playerName) { 
         console.log(`Player ${playerId} HP updated: ${hp}`);
         playerHp -= data.damage;
         showDamageOverlay();
