@@ -33,6 +33,11 @@ function setupWebSocket(io) {
             }
         });
 
+
+        socket.on('gunsound',() => {
+            io.emit('soundofgun');
+        });
+
         socket.on('positionUpdate', data => {
             const { name, position, rotation, spotLightState } = data;
             if (players[name]) {

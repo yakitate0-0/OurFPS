@@ -51,7 +51,7 @@ const set_sound = new Audio("/assets/sounds/set.mp3");
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
 // 初期化関数
-export function init(receivedEnemyName,receivedPlayername) {
+export function init(receivedEnemyName, receivedPlayername) {
 
     enemyName = receivedEnemyName;
     playerName = receivedPlayername;
@@ -520,33 +520,6 @@ socket.on('soundofgun', () => {
     shoot1_sound.play();
 });
 
-socket.on('corectPositions', (data) => {
-    nowEnemyPositions = data.positions; // 追加：nowEnemyPositionsを更新
-
-    // 敵の位置情報をBearモデルに反映
-    const enemyId = Object.keys(data.positions).find(id => id !== socket.id); // 自分のID以外のIDを取得
-    if (bearModel && enemyId) {
-        const enemyPosition = data.positions[enemyId];
-        const enemyRotation = data.rotations[enemyId];
-
-        bearModel.position.set(enemyPosition.x, enemyPosition.y, enemyPosition.z);
-        bearModel.rotation.set(enemyRotation.x, enemyRotation.y + Math.PI, enemyRotation.z);
-
-        // 敵のスポットライトの位置と方向をBearモデルと同期
-        enemySpotLight.position.copy(bearModel.position);
-        enemySpotLight.target.position.set(
-            enemyPosition.x + Math.sin(enemyRotation.y + Math.PI),
-            enemyPosition.y,
-            enemyPosition.z + Math.cos(enemyRotation.y + Math.PI)
-        );
-        enemySpotLight.target.updateMatrixWorld();
-
-        // サーバーから受信したスポットライトの状態を反映
-        enemySpotLight.visible = data.spotLightStates[enemyId];
-    }
-});
-
-
 function createBullet() {
     const bulletGeometry = new THREE.SphereGeometry(0.1, 8, 8);
     const bulletMaterial = new THREE.MeshBasicMaterial({ color: 0xff0000 });
@@ -671,13 +644,13 @@ socket.on('damage', (data) => {
     const hp = data.damage;
     const playerId = data.enemyName.name;
     console.log(playerId);
-    if (playerId === playerName) { 
+    if (playerId === playerName) {
         console.log(`Player ${playerId} HP updated: ${hp}`);
         playerHp -= data.damage;
         showDamageOverlay();
         if (playerHp < 0) playerHp = 0;
         updateHpBar();
-    }else {
+    } else {
         console.warn("I am not get damage");
     }
 });
@@ -722,10 +695,11 @@ function updatePlayerPosition() {
         z: yawObject.rotation.z
     };
 
-    socket.emit('enemyPosition', {
+    socket.emit('positionUpdate', {
+        name: playerName,
         position: playerPosition,
         rotation: playerRotation,
-        spotLightVisible: spotLight.visible // スポットライトの状態を送信
+        spotLightState: spotLight.visible // スポットライトの状態を送信
     });
 }
 
