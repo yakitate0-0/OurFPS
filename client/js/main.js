@@ -35,6 +35,7 @@ socket.on('matchFound', data => {
     document.getElementById('loading-spinner').style.display = 'none';
     document.getElementById('FPSCanvas').style.display = 'block';
     document.getElementById('aiming').style.display = 'block';
+    document.getElementById('hp-bar-container').style.display = 'flex';
 
     // ゲームを開始
     init(window.enemyName, window.myname); // 初期化関数に敵の名前を渡す
