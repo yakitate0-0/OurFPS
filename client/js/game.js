@@ -727,7 +727,6 @@ socket.on('spawn', (data) => {
     }
 });
 
-
 export function animate() {
     requestAnimationFrame(animate);
 
@@ -743,50 +742,70 @@ export function animate() {
 
     const currentSpeed = isCrouching ? crouchSpeed : normalSpeed;
 
-    if (moveForward || moveBackward) velocity.z -= direction.z * currentSpeed * delta;
-    if (moveLeft || moveRight) velocity.x -= direction.x * currentSpeed * delta;
+    // プレイヤーの向きに基づいて移動ベクトルを計算
+    const moveVector = new THREE.Vector3();
+    if (moveForward || moveBackward) moveVector.z -= direction.z * currentSpeed * delta;
+    if (moveLeft || moveRight) moveVector.x -= direction.x * currentSpeed * delta;
 
+    // 移動ベクトルをプレイヤーの向きに合わせて回転
+    moveVector.applyQuaternion(yawObject.quaternion);
+
+    velocity.add(moveVector);
     velocity.y -= gravity * delta;
 
     const oldPosition = yawObject.position.clone();
 
-    yawObject.translateX(velocity.x * delta);
-    yawObject.translateZ(velocity.z * delta);
+    // X軸とZ軸の移動を分離
+    const newPosition = oldPosition.clone();
+    newPosition.add(velocity.clone().multiplyScalar(delta));
+
+    // プレイヤーのバウンディングボックスを作成
+    const playerBox = new THREE.Box3().setFromCenterAndSize(
+        new THREE.Vector3(newPosition.x, newPosition.y - normalHeight / 2, newPosition.z),
+        new THREE.Vector3(1, normalHeight, 1)
+    );
+
+    // 衝突判定
+    let collisionX = false;
+    let collisionZ = false;
+    for (const box of collisionBoxes) {
+        if (playerBox.intersectsBox(box)) {
+            const xOverlap = Math.min(playerBox.max.x, box.max.x) - Math.max(playerBox.min.x, box.min.x);
+            const zOverlap = Math.min(playerBox.max.z, box.max.z) - Math.max(playerBox.min.z, box.min.z);
+            
+            if (xOverlap < zOverlap) {
+                collisionX = true;
+            } else {
+                collisionZ = true;
+            }
+        }
+    }
+
+    // 衝突していない軸のみ移動を適用
+    if (!collisionX) {
+        yawObject.position.x = newPosition.x;
+    }
+    if (!collisionZ) {
+        yawObject.position.z = newPosition.z;
+    }
+
     yawObject.position.y += velocity.y * delta;
 
+    // 床との衝突判定
+    if (yawObject.position.y < normalHeight && velocity.y < 0) {
+        yawObject.position.y = Math.max(crouchHeight, normalHeight);
+        velocity.y = 0;
+        canJump = true;
+        isJumping = false;
+    }
+
+    // フロアの境界チェック
     const halfFloorSize_x = FLOOR_SIZE_x / 2;
     const halfFloorSize_z = FLOOR_SIZE_z / 2;
     if (Math.abs(yawObject.position.x) > halfFloorSize_x || Math.abs(yawObject.position.z) > halfFloorSize_z) {
         yawObject.position.copy(oldPosition);
         velocity.x = 0;
         velocity.z = 0;
-    }
-
-    // プレイヤーのバウンディングボックスを作成
-    const playerBox = new THREE.Box3().setFromCenterAndSize(
-        new THREE.Vector3(yawObject.position.x, yawObject.position.y - normalHeight / 2, yawObject.position.z),
-        new THREE.Vector3(1, normalHeight, 1)
-    );
-
-    // 衝突判定
-    let collisionDetected = false;
-    for (const box of collisionBoxes) {
-        if (playerBox.intersectsBox(box)) {
-            collisionDetected = true;
-            break;
-        }
-    }
-
-    if (collisionDetected) {
-        yawObject.position.copy(oldPosition);
-        velocity.y = Math.min(0, velocity.y); // 落下を止める
-    }
-
-    if (yawObject.position.y < normalHeight && velocity.y < 0) {
-        yawObject.position.y = Math.max(crouchHeight, normalHeight);
-        velocity.y = 0;
-        canJump = true;
-        isJumping = false;
     }
 
     // しゃがみ状態を反映する
@@ -796,18 +815,18 @@ export function animate() {
         yawObject.position.y = normalHeight;
     }
 
+    // 以下は変更なし
     if (isShooting && currentTime - lastShotTime > fireRate) {
         shoot();
         lastShotTime = currentTime;
     }
 
-    updatePlayerPosition(); // プレイヤーの位置情報を送信
-
-    moveBullets(delta); // 弾丸を移動
-    checkCollisions(); // 当たり判定
+    updatePlayerPosition();
+    moveBullets(delta);
+    checkCollisions();
 
     if (gunModel) {
-        gunModel.updateMatrixWorld(); // 銃の位置を更新
+        gunModel.updateMatrixWorld();
     }
 
     renderer.render(scene, camera);
