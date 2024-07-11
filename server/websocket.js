@@ -5,6 +5,12 @@ function setupWebSocket(io) {
     io.on('connection', (socket) => {
         console.log('A user connected:', socket.id);
 
+        socket.on('change_port_to_8080', () => {
+            console.log("Port change to 8080 requested");
+            // クライアントにポート8080にリダイレクトする指示を送信
+            socket.emit('redirect');
+        });
+
         socket.on('register', name => {
             if (Object.values(players).some(player => player.name === name)) {
                 socket.emit('error', 'Name already taken');
@@ -56,7 +62,7 @@ function setupWebSocket(io) {
                 players[name].position = position;
                 players[name].rotation = rotation;
                 players[name].spotLightState = spotLightState;
-                console.log(`Position updated for ${name}`, position, rotation, spotLightState); // デバッグログ
+                // console.log(`Position updated for ${name}`, position, rotation, spotLightState); // デバッグログ
                 // 全プレイヤーに位置情報をブロードキャスト（必要に応じて）
                 io.emit('updatePositions', players);
             }

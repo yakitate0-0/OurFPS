@@ -563,12 +563,12 @@ function moveBullets(delta) {
 }
 
 socket.on('updatePositions', data => {
-    console.log('Received updated positions:', data); // デバッグログ
+    // console.log('Received updated positions:', data); 
     nowEnemyPositions = data; // すべてのプレイヤーの位置情報を更新
 
     // 敵の位置情報をBearモデルに反映
     if (bearModel && enemyName) {
-        console.log(`Updating enemy position for ${enemyName}`); // デバッグログ
+        // console.log(`Updating enemy position for ${enemyName}`); 
         const enemyPosition = data[enemyName].position;
         const enemyRotation = data[enemyName].rotation;
 
