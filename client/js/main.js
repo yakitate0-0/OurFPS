@@ -1,4 +1,5 @@
 import { init, animate } from "./game.js";
+let loser = '';
 
 const socket = io();
 let playerName = '';
@@ -42,7 +43,9 @@ socket.on('matchFound', data => {
 
 socket.on('gameOver', data => {
     console.log(`loser is ${data.loser}`);
+    loser = data.loser;
     const message = data.loser === window.myname ? 'You Lose!' : 'You Win!';
+    console.log("Judged");
     alert(message);
     socket.emit('change_port_to_8080');
 });
@@ -52,5 +55,5 @@ socket.on('redirect', data =>  {
     const host = window.location.hostname;
     const newPort = 8080;
     // クライアント側でポート8080にリダイレクト
-    window.location.href = `http://${host}:${newPort}`;
+    window.location.href = `http://${host}:${newPort}?result=${encodeURIComponent(loser)}`;
 });
