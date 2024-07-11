@@ -1,14 +1,14 @@
 body {
     margin: 0;
     overflow: hidden;
-    cursor: auto;
+    cursor: none;
     height: 100vh;
-    background-color: #0d0d0d;
+    background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
     display: flex;
     justify-content: center;
     align-items: center;
-    font-family: 'Arial', sans-serif;
-    color: white;
+    font-family: 'Rajdhani', sans-serif;
+    color: #e0e0e0;
 }
 
 canvas {
@@ -21,51 +21,53 @@ canvas {
     display: flex;
     flex-direction: column;
     align-items: center;
-    background: #1c1c1c;
-    padding: 30px;
-    border-radius: 15px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
-    transition: all 0.4s ease;
+    background: rgba(28, 28, 28, 0.8);
+    padding: 40px;
+    border-radius: 20px;
+    box-shadow: 0 0 30px rgba(255, 0, 0, 0.3);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     z-index: 1000;
+    backdrop-filter: blur(10px);
 }
 
 #register-section:hover {
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+    box-shadow: 0 0 50px rgba(255, 0, 0, 0.5);
+    transform: translateY(-5px);
 }
 
 #playerNameInput {
-    width: 250px;
-    padding: 15px;
-    margin-bottom: 20px;
-    border: 2px solid #ff0000;
-    border-radius: 25px;
-    background: #121212;
-    color: white;
+    width: 280px;
+    padding: 15px 20px;
+    margin-bottom: 25px;
+    border: 2px solid #ff3333;
+    border-radius: 30px;
+    background: rgba(18, 18, 18, 0.8);
+    color: #e0e0e0;
     font-size: 18px;
     outline: none;
     transition: all 0.3s ease;
 }
 
 #playerNameInput:focus {
-    border-color: #8b0000;
-    box-shadow: 0 0 10px rgba(255, 0, 0, 0.7);
+    border-color: #ff0000;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
 }
 
 button#registerBtn,
 button#joinMatchmakingBtn {
-    background: linear-gradient(45deg, #ff0000, #8b0000);
-    border: 2px solid #ff0000;
-    color: white;
+    background: linear-gradient(45deg, #ff3333, #ff0000);
+    border: none;
+    color: #ffffff;
     padding: 15px 40px;
     font-size: 20px;
     font-weight: bold;
     text-transform: uppercase;
     border-radius: 50px;
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.3);
+    box-shadow: 0 10px 20px rgba(255, 0, 0, 0.3);
     cursor: pointer;
     position: relative;
     overflow: hidden;
-    transition: all 0.4s ease;
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
     margin: 10px 0;
     z-index: 0;
 }
@@ -78,7 +80,7 @@ button#joinMatchmakingBtn::before {
     left: -50%;
     width: 200%;
     height: 200%;
-    background: radial-gradient(circle, rgba(255, 255, 255, 0.15), rgba(255, 255, 255, 0) 50%);
+    background: radial-gradient(circle, rgba(255, 255, 255, 0.3), rgba(255, 255, 255, 0) 70%);
     transition: all 0.75s ease;
     transform: translateX(-100%) rotate(-45deg);
     z-index: 1;
@@ -92,15 +94,15 @@ button#joinMatchmakingBtn:hover::before {
 
 button#registerBtn:hover,
 button#joinMatchmakingBtn:hover {
-    color: #ff0000;
-    background: #1c1c1c;
-    box-shadow: 0 12px 24px rgba(0, 0, 0, 0.5);
+    background: linear-gradient(45deg, #ff0000, #cc0000);
+    box-shadow: 0 15px 30px rgba(255, 0, 0, 0.5);
+    transform: translateY(-2px);
 }
 
 button#registerBtn:active,
 button#joinMatchmakingBtn:active {
-    transform: scale(0.95);
-    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.5);
+    transform: scale(0.98) translateY(2px);
+    box-shadow: 0 5px 10px rgba(255, 0, 0, 0.4);
 }
 
 #matchmaking {
@@ -120,20 +122,15 @@ button#joinMatchmakingBtn:active {
     z-index: 1003;
     width: 100px;
     height: 100px;
-    border: 10px solid #0d0d0d;
+    border: 10px solid rgba(255, 0, 0, 0.1);
     border-top: 10px solid #ff0000;
     border-radius: 50%;
     animation: spin 1s linear infinite;
 }
 
 @keyframes spin {
-    0% {
-        transform: translate(-50%, -50%) rotate(0deg);
-    }
-
-    100% {
-        transform: translate(-50%, -50%) rotate(360deg);
-    }
+    0% { transform: translate(-50%, -50%) rotate(0deg); }
+    100% { transform: translate(-50%, -50%) rotate(360deg); }
 }
 
 #loading-screen {
@@ -145,26 +142,19 @@ button#joinMatchmakingBtn:active {
     left: 0;
     width: 100%;
     height: 100%;
-    background: rgba(0, 0, 0, 0.7);
-    color: white;
-    font-size: 24px;
+    background: rgba(0, 0, 0, 0.8);
+    color: #ff3333;
+    font-size: 28px;
     z-index: 1000;
 }
 
 #loading-text {
-    animation: blink 1s infinite;
+    animation: pulse 1.5s infinite;
 }
 
-@keyframes blink {
-
-    0%,
-    100% {
-        opacity: 1;
-    }
-
-    50% {
-        opacity: 0.5;
-    }
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.7; transform: scale(0.98); }
 }
 
 #FPSCanvas {
@@ -188,6 +178,7 @@ button#joinMatchmakingBtn:active {
 #aiming img {
     width: 50px;
     height: auto;
+    filter: drop-shadow(0 0 5px rgba(255, 0, 0, 0.7));
 }
 
 #hp-bar-container {
@@ -199,8 +190,8 @@ button#joinMatchmakingBtn:active {
     height: 5vh;
     background: rgba(0, 0, 0, 0.7);
     border-radius: 2.5vh;
-    border: 0.2vh solid #ff0000;
-    box-shadow: 0 0 1.5vh rgba(255, 0, 0, 0.5);
+    border: 0.2vh solid #ff3333;
+    box-shadow: 0 0 20px rgba(255, 0, 0, 0.5);
     overflow: hidden;
     z-index: 1001;
     align-items: center;
@@ -209,9 +200,9 @@ button#joinMatchmakingBtn:active {
 #hp-bar {
     width: 100%;
     height: 100%;
-    background: linear-gradient(to right, #ff0000, #ff8000);
+    background: linear-gradient(to right, #ff0000, #ff3333);
     border-radius: 2vh;
-    transition: width 0.3s ease-in-out;
+    transition: width 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275);
 }
 
 #damage-overlay {
@@ -220,7 +211,7 @@ button#joinMatchmakingBtn:active {
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(255, 0, 0, 0.7);
+    background: radial-gradient(circle, rgba(255, 0, 0, 0.6) 0%, rgba(255, 0, 0, 0) 70%);
     display: none;
     z-index: 1000;
     pointer-events: none;
@@ -231,8 +222,9 @@ button#joinMatchmakingBtn:active {
     position: fixed;
     top: 43%;
     right: 45%;
-    font-size: 30px;
-    color: yellow;
+    font-size: 36px;
+    color: #ffff00;
+    text-shadow: 0 0 10px rgba(255, 255, 0, 0.7);
     display: none;
     z-index: 1000;
     pointer-events: none;
@@ -240,21 +232,11 @@ button#joinMatchmakingBtn:active {
 }
 
 @keyframes hitFadeOut {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-    }
+    from { opacity: 1; transform: scale(1.2); }
+    to { opacity: 0; transform: scale(1); }
 }
 
 @keyframes fadeOut {
-    from {
-        opacity: 1;
-    }
-
-    to {
-        opacity: 0;
-    }
+    from { opacity: 1; }
+    to { opacity: 0; }
 }
