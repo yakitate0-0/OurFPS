@@ -19,6 +19,7 @@ let lastShotTime = 0;
 let nowEnemyPositions = {};
 let bearModel;
 let enemySpotLight; // 敵のスポットライト
+let enemySpotLightHed;
 let bullets = []; // 弾丸を格納する配列
 let collisionBoxes = []; // 衝突判定の対象となるオブジェクトのバウンディングボックス配列
 let playerHp = 100; // 初期HP
@@ -291,6 +292,11 @@ export function init(receivedEnemyName, receivedPlayername) {
             enemySpotLight.visible = false; // 初期状態はオフ
             scene.add(enemySpotLight);
             scene.add(enemySpotLight.target);
+
+            enemySpotLightHed = new THREE.SpotLight(0xffffff, 3.5, 100, Math.PI / 10, 0.2, 1); // 照射範囲を狭く
+            enemySpotLightHed.visible = false; // 初期状態はオフ
+            scene.add(enemySpotLightHed);
+            scene.add(enemySpotLightHed.target);
 
             // ロード完了後にロード画面を非表示にする
             modelLoaded();
@@ -586,6 +592,13 @@ socket.on('updatePositions', data => {
 
         // サーバーから受信したスポットライトの状態を反映
         enemySpotLight.visible = data[enemyName].spotLightState;
+
+        enemySpotLightHed.position.set(enemyPosition.x, enemyPosition.y + 2.0, enemyPosition.z);
+        enemySpotLightHed.target.position.set(enemyPosition.x, enemyPosition.y + 0.2, enemyPosition.z);
+        enemySpotLightHed.target.updateMatrixWorld();
+
+        // サーバーから受信したスポットライトの状態を反映
+        enemySpotLightHed.visible = data[enemyName].spotLightState;
     }
 });
 
