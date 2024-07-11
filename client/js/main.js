@@ -49,6 +49,8 @@ socket.on('gameOver', data => {
 
 socket.on('redirect', data =>  {
     console.log("Redirecting to port 8080");
+    const host = window.location.hostname;
+    const newPort = 8080;
     // クライアント側でポート8080にリダイレクト
-    window.location.href = 'http://localhost:8080';
+    window.location.href = `http://${host}:${newPort}`;
 });
