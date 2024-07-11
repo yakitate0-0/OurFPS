@@ -28,22 +28,8 @@ function setupWebSocket(io) {
             if (waitingPlayer && waitingPlayer !== name) {
                 const gameId = `${name}-${waitingPlayer}`;
                 socket.join(gameId);
-                if (players[waitingPlayer] && players[waitingPlayer].socketId) {
-                    const waitingSocket = io.sockets.sockets.get(players[waitingPlayer].socketId);
-                    if (waitingSocket) {
-                        waitingSocket.join(gameId);
-                    } else {
-                        console.log(`Socket for ${waitingPlayer} not found`);
-                        socket.emit('error', 'Opponent disconnected');
-                        waitingPlayer = null;
-                        return;
-                    }
-                } else {
-                    console.log(`Invalid waiting player: ${waitingPlayer}`);
-                    socket.emit('error', 'Invalid opponent');
-                    waitingPlayer = null;
-                    return;
-                } io.to(gameId).emit('matchFound', { gameId, opponentName: waitingPlayer, playerName: name });
+                io.sockets.sockets.get(players[waitingPlayer].socketId).join(gameId);
+                io.to(gameId).emit('matchFound', { gameId, opponentName: waitingPlayer, playerName: name });
                 players[name].inGame = true;
                 players[waitingPlayer].inGame = true;
 
