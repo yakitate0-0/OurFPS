@@ -56,5 +56,5 @@ socket.on('redirect', data =>  {
     const host = window.location.hostname;
     const newPort = 8080;
     // クライアント側でポート8080にリダイレクト
-    window.location.href = `http://${host}:${newPort}?result=${encodeURIComponent(loser)}`;
+    window.location.href = `http://${host}:${newPort}/xammpFPS/?result=${encodeURIComponent(loser)}`;
 });
