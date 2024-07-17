@@ -3,10 +3,27 @@ let loser = '';
 
 const socket = io();
 let playerName = '';
-document.getElementById('registerBtn').addEventListener('click', () => {
-    playerName = document.getElementById('playerNameInput').value;
+
+// Function to get the value of a query parameter by name
+function getQueryParam(name) {
+    const urlParams = new URLSearchParams(window.location.search);
+    return urlParams.get(name);
+}
+
+// Function to remove a query parameter from the URL
+function removeQueryParam(name) {
+    const url = new URL(window.location);
+    url.searchParams.delete(name);
+    window.history.replaceState({}, document.title, url.toString());
+}
+
+// Extract playerName from the URL
+playerName = getQueryParam('id');
+if (playerName) {
     socket.emit('register', playerName);
-});
+    // Remove the id parameter from the URL
+    removeQueryParam('id');
+}
 
 socket.on('registered', data => {
     console.log('Registered as', data.name);
@@ -30,8 +47,7 @@ socket.on('matchFound', data => {
     }
 
     console.log(`my name is ${window.myname}`);
-
-    console.log(`Match found! Game ID: ${gameId}, Opponent Name: ${window.enemyName},playername: ${playerName}`);
+    console.log(`Match found! Game ID: ${gameId}, Opponent Name: ${window.enemyName}, playername: ${playerName}`);
     document.getElementById('loading-spinner').style.display = 'none';
     document.getElementById('FPSCanvas').style.display = 'block';
     document.getElementById('aiming').style.display = 'block';
@@ -51,10 +67,10 @@ socket.on('gameOver', data => {
     socket.emit('change_port_to_8080');
 });
 
-socket.on('redirect', data =>  {
+socket.on('redirect', data => {
     console.log("Redirecting to port 8080");
     const host = window.location.hostname;
     const newPort = 8080;
     // クライアント側でポート8080にリダイレクト
-    window.location.href = `http://${host}:${newPort}/xammpFPS/?result=${encodeURIComponent(loser)}`;
+    window.location.href = `http://${host}:${newPort}/xammpFPS/?result=${encodeURIComponent(loser)}&playerid=${playerName}`;
 });
