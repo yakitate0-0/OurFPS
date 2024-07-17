@@ -2,6 +2,7 @@ import { init, animate } from "./game.js";
 let loser = '';
 
 const socket = io();
+let backmusic = document.getElementById('backmusic');
 let playerName = '';
 
 // Function to get the value of a query parameter by name
@@ -33,8 +34,10 @@ socket.on('registered', data => {
 });
 
 document.getElementById('joinMatchmakingBtn').addEventListener('click', () => {
+    backmusic.play();
     document.getElementById('matchmaking').style.display = 'none';
     document.getElementById('loading-spinner').style.display = 'block';
+
     socket.emit('joinMatchmaking', playerName);
 });
 
