@@ -1,9 +1,13 @@
+let players = {}; // プレイヤー情報を保持するオブジェクト
+let waitingPlayer = null; // マッチング待機中のプレイヤー名を保持
+
 function setupWebSocket(io) {
     io.on('connection', (socket) => {
         console.log('A user connected:', socket.id);
 
         socket.on('change_port_to_8080', () => {
             console.log("Port change to 8080 requested");
+            // クライアントにポート8080にリダイレクトする指示を送信
             socket.emit('redirect');
         });
 
@@ -45,7 +49,7 @@ function setupWebSocket(io) {
                     rotation: { x: 0, y: Math.PI / 4, z: 0 }
                 });
 
-                waitingPlayer = null;
+                waitingPlayer = null; // マッチングが成立したのでリセット
             } else {
                 waitingPlayer = name;
                 socket.emit('waiting', 'Waiting for an opponent...');
@@ -94,6 +98,7 @@ function setupWebSocket(io) {
         });
 
         socket.on('disconnect', () => {
+            // 名前を使ってプレイヤーを識別
             const name = Object.keys(players).find(key => players[key].socketId === socket.id);
             if (name) {
                 console.log('User disconnected:', name);
