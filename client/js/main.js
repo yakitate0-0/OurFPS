@@ -66,7 +66,6 @@ socket.on('gameOver', data => {
     loser = data.loser;
     const message = data.loser === window.myname ? 'You Lose!' : 'You Win!';
     console.log("Judged");
-    alert(message);
     socket.emit('change_port_to_8080');
 });
 
