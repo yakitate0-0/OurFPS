@@ -1,7 +1,7 @@
 body {
     margin: 0;
     overflow: hidden;
-    cursor: none;
+    cursor: auto;
     height: 100vh;
     background: linear-gradient(135deg, #0d0d0d 0%, #1a1a1a 100%);
     display: flex;

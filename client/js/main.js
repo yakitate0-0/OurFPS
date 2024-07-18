@@ -5,6 +5,7 @@ const socket = io();
 let backmusic = document.getElementById('backmusic');
 let playerName = '';
 
+
 // Function to get the value of a query parameter by name
 function getQueryParam(name) {
     const urlParams = new URLSearchParams(window.location.search);
@@ -36,6 +37,7 @@ socket.on('registered', data => {
 document.getElementById('joinMatchmakingBtn').addEventListener('click', () => {
     backmusic.play();
     document.getElementById('matchmaking').style.display = 'none';
+    document.body.style.cursor = 'none';
     document.getElementById('loading-spinner').style.display = 'block';
 
     socket.emit('joinMatchmaking', playerName);
