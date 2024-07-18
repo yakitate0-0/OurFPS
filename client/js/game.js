@@ -13,7 +13,7 @@ let spotLight;
 let loadedModels = 0;
 let gunModel;
 let isShooting = false;
-let ammo = 50;
+let ammo = 10; //球の数
 let isReloading = false;
 let lastShotTime = 0;
 let nowEnemyPositions = {};
@@ -29,6 +29,7 @@ let playerName = window.myname;
 let enemyName = window.enemyName;
 let shaking = 1; //横の球ブレ
 let damegepala = 10; //球のダメージ数
+var nomalLight = 0.1; //太陽の強さ
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
@@ -44,17 +45,27 @@ const crouchHeight = 1.1; // しゃがみ時の高さ
 const lightSize = 6;
 const FLOOR_SIZE_x = 26;
 const FLOOR_SIZE_z = 20;
-const nomalLight = 0.1; //太陽の強さ
 const shoot_sound = new Audio("/assets/sounds/shoot.mp3");
 const shoot1_sound = new Audio("/assets/sounds/shoot.mp3");
 const reload_sound = new Audio("/assets/sounds/reload.mp3");
 const ready_sound = new Audio("/assets/sounds/ready.mp3");
 const set_sound = new Audio("/assets/sounds/set.mp3");
+const params = new URLSearchParams(window.location.search);
+const char = params.get('char');
+const url = new URL(window.location);
+url.searchParams.delete('char');
+window.history.replaceState({}, document.title, url);
+
+const guntimes = ammo;
 
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
 // 初期化関数
 export function init(receivedEnemyName, receivedPlayername) {
+
+    if (char == 1) {
+        nomalLight = 2;
+    }
 
     enemyName = receivedEnemyName;
     playerName = receivedPlayername;
@@ -514,7 +525,7 @@ function reload() {
         reload_sound.play();
         set_sound.play();
         setTimeout(() => {
-            ammo = 50;
+            ammo = guntimes;
             isReloading = false;
             console.log("Reload complete!");
             ready_sound.play();
@@ -772,7 +783,7 @@ export function animate() {
         if (playerBox.intersectsBox(box)) {
             const xOverlap = Math.min(playerBox.max.x, box.max.x) - Math.max(playerBox.min.x, box.min.x);
             const zOverlap = Math.min(playerBox.max.z, box.max.z) - Math.max(playerBox.min.z, box.min.z);
-            
+
             if (xOverlap < zOverlap) {
                 collisionX = true;
             } else {
