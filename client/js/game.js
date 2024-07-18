@@ -34,6 +34,7 @@ let normalSpeed = 60.0;  //走る速さ
 let reloadTime = 2000; // リロード時間（ミリ秒）
 let heal = false;
 let jumpSpeed = 9.0;
+let ant = 0;
 
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
@@ -58,8 +59,7 @@ const url = new URL(window.location);
 url.searchParams.delete('char');
 window.history.replaceState({}, document.title, url);
 
-console.log("キャラのデータです。");
-console.log(char);
+console.warn(char);
 
 if (char == 0) {
     // Do nothing
@@ -77,9 +77,11 @@ if (char == 0) {
     heal = true;
 } else if (char == 6) {
     nomalLight = 2;
-    console.log("nightbra");
+    socket.emit('breaker');
 } else if (char == 7) {
-    nomalLight = 8;
+    ammo = 3;
+    reloadTime = 4000;
+    ant = 1;
 } else {
     // Do nothing or handle default case
 }
@@ -769,6 +771,16 @@ socket.on('spawn', (data) => {
         console.log(`Player ${name} spawned at position (${position.x}, ${position.y}, ${position.z})`);
     }
 });
+
+socket.on('anti', () => {
+    console.log("I am anti");
+    if (ant == 1
+    ) {
+        damegepala = 150; // 値の代入を正しく行う
+        console.log("breakerssssss");
+    }
+});
+
 
 export function animate() {
     requestAnimationFrame(animate);

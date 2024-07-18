@@ -11,6 +11,12 @@ function setupWebSocket(io) {
             socket.emit('redirect');
         });
 
+        socket.on('breaker', () => {
+            console.log("アンチ");
+            io.emit('anti');
+        });
+        
+
         socket.on('register', name => {
             if (Object.values(players).some(player => player.name === name)) {
                 socket.emit('error', 'Name already taken');
