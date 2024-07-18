@@ -64,7 +64,7 @@ console.log(char);
 if (char == 0) {
     // Do nothing
 } else if (char == 1) {
-    normalSpeed = 100;
+    normalSpeed = 120;
 } else if (char == 2) {
     ammo = 30;
 } else if (char == 3) {
@@ -85,6 +85,7 @@ if (char == 0) {
 }
 
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
+const guntimes = ammo;
 
 // 初期化関数
 export function init(receivedEnemyName, receivedPlayername) {
@@ -98,7 +99,6 @@ export function init(receivedEnemyName, receivedPlayername) {
         document.body.style.cursor = 'none';
     }
 
-    const guntimes = ammo;
 
     // ロード画面の表示
     showLoadingScreen();
