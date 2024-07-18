@@ -29,16 +29,18 @@ let playerName = window.myname;
 let enemyName = window.enemyName;
 let shaking = 1; //横の球ブレ
 let damegepala = 10; //球のダメージ数
-var nomalLight = 0.1; //太陽の強さ
+let nomalLight = 0.1; //太陽の強さ
+let normalSpeed = 60.0;  //走る速さ
+let reloadTime = 2000; // リロード時間（ミリ秒）
+let heal = false;
+let jumpSpeed = 9.0;
+
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
 const fireRate = 100; // 連射の間隔（ミリ秒）
-const reloadTime = 2000; // リロード時間（ミリ秒）
 const totalModels = 5; // 読み込むモデルの総数
-const jumpSpeed = 9.0;
 const gravity = 30.0;
 const clock = new THREE.Clock();
-const normalSpeed = 60.0;
 const crouchSpeed = 20.0; // しゃがみ時の速度
 const normalHeight = 1.5; // 通常時の高さ
 const crouchHeight = 1.1; // しゃがみ時の高さ
@@ -56,16 +58,41 @@ const url = new URL(window.location);
 url.searchParams.delete('char');
 window.history.replaceState({}, document.title, url);
 
-const guntimes = ammo;
-
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
 // 初期化関数
 export function init(receivedEnemyName, receivedPlayername) {
 
-    if (char == 1) {
-        nomalLight = 2;
+    switch (char) {
+        case 0:
+            break;
+        case 1:
+            normalSpeed = 100;
+            break;
+        case 2:
+            ammo = 30;
+            break;
+        case 3:
+            ammo = 1;
+            damegepala = 90;
+            reloadTime = 5000;
+            break;
+        case 4:
+            jumpSpeed = 15.0;
+            break;
+        case 5:
+            heal = true;
+            break;
+        case 6:
+            nomalLight = 2;
+            break;
+        case 7:
+            nomalLight = 8;
+            break;
+        default:
+            break;
     }
+
 
     enemyName = receivedEnemyName;
     playerName = receivedPlayername;
@@ -75,6 +102,8 @@ export function init(receivedEnemyName, receivedPlayername) {
     if (document.body) {
         document.body.style.cursor = 'none';
     }
+
+    const guntimes = ammo;
 
     // ロード画面の表示
     showLoadingScreen();
@@ -452,6 +481,14 @@ export function onKeyDown(event) {
         case 'KeyR':
             reload();
             break;
+        case 'KeyX':
+            if (heal == true) {
+                heal = false;
+                playerHp = playerHp + 50;
+                setTimeout(() => {
+                    heal = true;
+                }, 30000);
+            }
     }
 }
 
