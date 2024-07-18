@@ -480,11 +480,15 @@ export function onKeyDown(event) {
             break;
         case 'KeyX':
             if (heal == true) {
+                console.warn("healing");
                 heal = false;
-                playerHp = playerHp + 50;
+                playerHp += 50;
+                updateHpBar();
+                socket.emit('heal', { playerName: playerName, healAmount: 50 }); // サーバに回復を伝える
                 setTimeout(() => {
                     heal = true;
                 }, 30000);
+
             }
     }
 }
@@ -516,7 +520,6 @@ export function onKeyUp(event) {
 function onMouseDown(event) {
     if (event.button === 0) { // 左クリック
         isShooting = true;
-        socket.emit('gunsound');
     } else if (event.button === 2) { // 右クリック
         spotLight.visible = !spotLight.visible;
         // スポットライトの状態をサーバーに送信
@@ -535,6 +538,7 @@ function shoot() {
     if (ammo > 0 && !isReloading) {
         shoot_sound.currentTime = 0;
         shoot_sound.play();
+        socket.emit('gunsound');
         // 実際の発砲処理をここに追加
         createBullet();
         ammo--;
@@ -714,6 +718,14 @@ socket.on('damage', (data) => {
     }
 });
 
+socket.on('healed', (data) => {
+    const { playerName: healedPlayer, newHp } = data;
+    if (healedPlayer === playerName) {
+        playerHp = newHp;
+        updateHpBar();
+    }
+});
+
 function showHitIndicator() {
     const hitIndicator = document.getElementById('hit-indicator');
     hitIndicator.style.display = 'block';
@@ -776,7 +788,7 @@ socket.on('anti', () => {
     console.log("I am anti");
     if (ant == 1
     ) {
-        damegepala = 150; // 値の代入を正しく行う
+        damegepala = 150;
         console.log("breakerssssss");
     }
 });

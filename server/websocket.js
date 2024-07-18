@@ -1,13 +1,9 @@
-let players = {}; // プレイヤー情報を保持するオブジェクト
-let waitingPlayer = null; // マッチング待機中のプレイヤー名を保持
-
 function setupWebSocket(io) {
     io.on('connection', (socket) => {
         console.log('A user connected:', socket.id);
 
         socket.on('change_port_to_8080', () => {
             console.log("Port change to 8080 requested");
-            // クライアントにポート8080にリダイレクトする指示を送信
             socket.emit('redirect');
         });
 
@@ -15,7 +11,6 @@ function setupWebSocket(io) {
             console.log("アンチ");
             io.emit('anti');
         });
-        
 
         socket.on('register', name => {
             if (Object.values(players).some(player => player.name === name)) {
@@ -50,13 +45,12 @@ function setupWebSocket(io) {
                     rotation: { x: 0, y: Math.PI / 4, z: 0 }
                 });
 
-                waitingPlayer = null; // マッチングが成立したのでリセット
+                waitingPlayer = null;
             } else {
                 waitingPlayer = name;
                 socket.emit('waiting', 'Waiting for an opponent...');
             }
         });
-
 
         socket.on('gunsound', () => {
             io.emit('soundofgun');
@@ -68,8 +62,6 @@ function setupWebSocket(io) {
                 players[name].position = position;
                 players[name].rotation = rotation;
                 players[name].spotLightState = spotLightState;
-                // console.log(`Position updated for ${name}`, position, rotation, spotLightState); // デバッグログ
-                // 全プレイヤーに位置情報をブロードキャスト（必要に応じて）
                 io.emit('updatePositions', players);
             }
         });
@@ -81,7 +73,6 @@ function setupWebSocket(io) {
 
         socket.on('hit', data => {
             const { enemyName, damage } = data;
-            console.log(players[enemyName]);
             if (players[enemyName]) {
                 players[enemyName].hp -= damage;
                 if (players[enemyName].hp <= 0) {
@@ -94,8 +85,15 @@ function setupWebSocket(io) {
             }
         });
 
+        socket.on('heal', data => {
+            const { playerName, healAmount } = data;
+            if (players[playerName]) {
+                players[playerName].hp = Math.min(players[playerName].hp + healAmount, 100); // HPは100を超えないように
+                io.emit('healed', { playerName: playerName, newHp: players[playerName].hp });
+            }
+        });
+
         socket.on('disconnect', () => {
-            // 名前を使ってプレイヤーを識別
             const name = Object.keys(players).find(key => players[key].socketId === socket.id);
             if (name) {
                 console.log('User disconnected:', name);
