@@ -58,41 +58,36 @@ const url = new URL(window.location);
 url.searchParams.delete('char');
 window.history.replaceState({}, document.title, url);
 
+console.log("キャラのデータです。");
+console.log(char);
+
+if (char == 0) {
+    // Do nothing
+} else if (char == 1) {
+    normalSpeed = 100;
+} else if (char == 2) {
+    ammo = 30;
+} else if (char == 3) {
+    ammo = 1;
+    damegepala = 90;
+    reloadTime = 5000;
+} else if (char == 4) {
+    jumpSpeed = 15.0;
+} else if (char == 5) {
+    heal = true;
+} else if (char == 6) {
+    nomalLight = 2;
+    console.log("nightbra");
+} else if (char == 7) {
+    nomalLight = 8;
+} else {
+    // Do nothing or handle default case
+}
+
 let wallBoxes = []; // 壁のバウンディングボックスを格納する配列
 
 // 初期化関数
 export function init(receivedEnemyName, receivedPlayername) {
-
-    switch (char) {
-        case 0:
-            break;
-        case 1:
-            normalSpeed = 100;
-            break;
-        case 2:
-            ammo = 30;
-            break;
-        case 3:
-            ammo = 1;
-            damegepala = 90;
-            reloadTime = 5000;
-            break;
-        case 4:
-            jumpSpeed = 15.0;
-            break;
-        case 5:
-            heal = true;
-            break;
-        case 6:
-            nomalLight = 2;
-            break;
-        case 7:
-            nomalLight = 8;
-            break;
-        default:
-            break;
-    }
-
 
     enemyName = receivedEnemyName;
     playerName = receivedPlayername;
