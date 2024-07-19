@@ -65,7 +65,7 @@ console.warn(char);
 if (char == 0) {
     // Do nothing
 } else if (char == 1) {
-    normalSpeed = 120;
+    normalSpeed = 90;
 } else if (char == 2) {
     ammo = 30;
 } else if (char == 3) {
