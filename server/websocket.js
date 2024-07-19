@@ -12,8 +12,8 @@ function setupWebSocket(io) {
         });
 
         socket.on('breaker', () => {
-            console.log("アンチ");
             io.emit('anti');
+            console.log("アンチ");
         });
 
         socket.on('register', name => {

@@ -786,8 +786,7 @@ socket.on('spawn', (data) => {
 
 socket.on('anti', () => {
     console.log("I am anti");
-    if (ant == 1
-    ) {
+    if (ant == 1) {
         damegepala = 150;
         console.log("breakerssssss");
     }
