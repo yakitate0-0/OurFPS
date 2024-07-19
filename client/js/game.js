@@ -35,6 +35,7 @@ let reloadTime = 2000; // リロード時間（ミリ秒）
 let heal = false;
 let jumpSpeed = 9.0;
 let ant = 0;
+let ant1 = 0;
 
 const bulletSpeed = 100;//　弾丸スピード
 const socket = io();
@@ -786,15 +787,16 @@ socket.on('spawn', (data) => {
 
 socket.on('anti', () => {
     console.log("I am anti");
-    if (ant == 1) {
-        damegepala = 150;
-        console.log("breakerssssss");
-    }
+    ant1 = 1;
 });
 
 
 export function animate() {
     requestAnimationFrame(animate);
+
+    if (ant == 1 && ant1 == 1) {
+        damegepala = 150;
+    }
 
     const delta = clock.getDelta();
     const currentTime = Date.now();
