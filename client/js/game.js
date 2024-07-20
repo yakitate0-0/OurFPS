@@ -81,6 +81,7 @@ if (char == 0) {
     socket.emit('breaker');
 } else if (char == 7) {
     ammo = 3;
+    damegepala = 20;
     reloadTime = 4000;
     ant = 1;
 } else {
