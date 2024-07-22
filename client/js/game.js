@@ -328,7 +328,6 @@ export function init(receivedEnemyName, receivedPlayername) {
         'assets/models/bear_nomal.glb',
         function (gltf) {
             bearModel = gltf.scene;
-            // bearModel.position.set(3, 1.4, 2);
             bearModel.scale.set(0.5, 0.5, 0.5);
             scene.add(bearModel);
 

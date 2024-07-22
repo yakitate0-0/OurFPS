@@ -7,7 +7,6 @@ function setupWebSocket(io) {
 
         socket.on('change_port_to_8080', () => {
             console.log("Port change to 8080 requested");
-            // クライアントにポート8080にリダイレクトする指示を送信
             socket.emit('redirect');
         });
 
@@ -41,12 +40,12 @@ function setupWebSocket(io) {
                 io.emit('spawn', {
                     name: name,
                     position: { x: 9, y: 1.5, z: -8 },
-                    rotation: { x: 0, y: Math.PI / 4, z: 0 }
+                    rotation: { x: 0, y: Math.PI / 2, z: 0 }
                 });
                 io.emit('spawn', {
                     name: waitingPlayer,
                     position: { x: -9, y: 1.5, z: 8 },
-                    rotation: { x: 0, y: Math.PI / 4, z: 0 }
+                    rotation: { x: 0, y: -Math.PI / 2, z: 0 }
                 });
 
                 waitingPlayer = null; // マッチングが成立したのでリセット
