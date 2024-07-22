@@ -21,7 +21,7 @@ function setupWebSocket(io) {
                 socket.emit('error', 'Name already taken');
                 return;
             }
-            players[name] = { name, hp: 100, position: {}, rotation: {}, spotLightState: false, inGame: false, socketId: socket.id };
+            players[name] = { name, hp: 110, position: {}, rotation: {}, spotLightState: false, inGame: false, socketId: socket.id };
             socket.emit('registered', { name });
         });
 
@@ -92,7 +92,7 @@ function setupWebSocket(io) {
         socket.on('heal', data => {
             const { playerName, healAmount } = data;
             if (players[playerName]) {
-                players[playerName].hp = Math.min(players[playerName].hp + healAmount, 100); // HPは100を超えないように
+                players[playerName].hp = Math.min(players[playerName].hp + healAmount, 110); // HPは100を超えないように
                 io.emit('healed', { playerName: playerName, newHp: players[playerName].hp });
             }
         });

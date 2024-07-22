@@ -22,7 +22,7 @@ let enemySpotLight; // 敵のスポットライト
 let enemySpotLightHed;
 let bullets = []; // 弾丸を格納する配列
 let collisionBoxes = []; // 衝突判定の対象となるオブジェクトのバウンディングボックス配列
-let playerHp = 100; // 初期HP
+let playerHp = 110; // 初期HP
 let pitchObject = new THREE.Object3D();
 let yawObject = new THREE.Object3D();
 let playerName = window.myname;
