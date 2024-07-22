@@ -159,6 +159,7 @@ export function init(receivedEnemyName, receivedPlayername) {
             console.log("load completed.");
             document.getElementById('aiming').style.display = 'block';
             document.getElementById('ammo-counter').style.display = 'block';
+            updateAmmoCount();
             animate();
         }
     }
