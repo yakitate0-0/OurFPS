@@ -29,9 +29,9 @@ let playerName = window.myname;
 let enemyName = window.enemyName;
 let shaking = 1; //横の球ブレ
 let damegepala = 10; //球のダメージ数
-let nomalLight = 0.1; //太陽の強さ
+let nomalLight = 0; //太陽の強さ
 let normalSpeed = 60.0;  //走る速さ
-let reloadTime = 2000; // リロード時間（ミリ秒）
+let reloadTime = 2500; // リロード時間（ミリ秒）
 let heal = false;
 let jumpSpeed = 9.0;
 let ant = 0;
@@ -63,7 +63,10 @@ window.history.replaceState({}, document.title, url);
 console.warn(char);
 
 if (char == 0) {
-    // Do nothing
+    normalSpeed = 70;
+    jumpSpeed = 10.0;
+    reloadTime = 2000;
+    nomalLight = 0.15;
 } else if (char == 1) {
     normalSpeed = 90;
 } else if (char == 2) {
