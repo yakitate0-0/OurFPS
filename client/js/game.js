@@ -67,6 +67,7 @@ if (char == 0) {
     jumpSpeed = 10.0;
     reloadTime = 2000;
     nomalLight = 0.15;
+    console.log("you are nomal.");
 } else if (char == 1) {
     normalSpeed = 90;
 } else if (char == 2) {
@@ -801,7 +802,7 @@ socket.on('anti', () => {
 function updateAmmoCount() {
     const ammoCounter = document.getElementById('ammo-counter');
     if (ammoCounter) {
-        ammoCounter.textContent = `Ammo: ${ammo}`;
+        ammoCounter.textContent = `Magazine : ${ammo}`;
     }
 }
 
