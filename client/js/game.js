@@ -158,6 +158,7 @@ export function init(receivedEnemyName, receivedPlayername) {
             hideLoadingScreen();
             console.log("load completed.");
             document.getElementById('aiming').style.display = 'block';
+            document.getElementById('ammo-counter').style.display = 'block';
             animate();
         }
     }
@@ -544,6 +545,7 @@ function shoot() {
         // 実際の発砲処理をここに追加
         createBullet();
         ammo--;
+        updateAmmoCount(); // Update ammo count display
         applyRecoil();
         if (ammo === 0) {
             reload();
@@ -568,6 +570,7 @@ function reload() {
             ammo = guntimes;
             isReloading = false;
             console.log("Reload complete!");
+            updateAmmoCount(); // Update ammo count display after reloading
             ready_sound.play();
         }, reloadTime);
     }
@@ -791,6 +794,12 @@ socket.on('anti', () => {
     ant1 = 1;
 });
 
+function updateAmmoCount() {
+    const ammoCounter = document.getElementById('ammo-counter');
+    if (ammoCounter) {
+        ammoCounter.textContent = `Ammo: ${ammo}`;
+    }
+}
 
 export function animate() {
     requestAnimationFrame(animate);

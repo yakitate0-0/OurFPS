@@ -245,6 +245,19 @@ button#joinMatchmakingBtn:active {
     animation: hitFadeOut 0.5s ease-out forwards;
 }
 
+#ammo-counter {
+    position: absolute;
+    bottom: 20px;
+    right: 20px;
+    font-size: 24px;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.5);
+    padding: 10px;
+    border-radius: 5px;
+    display: none;
+    z-index: 10;
+}
+
 @keyframes hitFadeOut {
     from {
         opacity: 1;
