@@ -98,6 +98,10 @@ const guntimes = ammo;
 // 初期化関数
 export function init(receivedEnemyName, receivedPlayername) {
 
+    if (char == 6) {
+        socket.emit('breaker');
+    }
+
     enemyName = receivedEnemyName;
     playerName = receivedPlayername;
     console.log(playerName);
@@ -794,7 +798,7 @@ socket.on('spawn', (data) => {
 });
 
 socket.on('anti', () => {
-    console.log("I am anti");
+    console.error("I am anti");
     ant1 = 1;
 });
 

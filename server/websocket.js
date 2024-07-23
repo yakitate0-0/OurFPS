@@ -1,5 +1,6 @@
 let players = {}; // プレイヤー情報を保持するオブジェクト
 let waitingPlayer = null; // マッチング待機中のプレイヤー名を保持
+let antibreaker = 0;
 
 function setupWebSocket(io) {
     io.on('connection', (socket) => {
