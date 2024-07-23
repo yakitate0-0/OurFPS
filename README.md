@@ -14,12 +14,12 @@ Windows / Mac
 
 *************************************
 キャラクターの説明
-1. nomal BREAKER
-2. Speed BREAKER
-3. Jump BREAKER
-4. Bullet BREAKER
-5. HP BREAKER
-6. Kill BREAKER
-7. NIGHT BREAKER
-8. Anti BREAKER
+1. nomal BREAKER     平均的にパラメータ向上
+2. Speed BREAKER     スピード向上
+3. Jump BREAKER      ジャンプ力向上
+4. Bullet BREAKER    弾数　30発
+5. HP BREAKER        30秒に1回「x」で回復
+6. Kill BREAKER      ２発でダウン可能
+7. NIGHT BREAKER     暗視
+8. Anti BREAKER      ある条件によってダメージ向上
 *************************************
